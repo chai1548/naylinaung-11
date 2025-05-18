@@ -3,1690 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ကုန်ပစ္စည်းလက်ခံမှု စီမံခန့်ခွဲရေးစနစ်</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <title>Google Maps ပုံစံ မြေပုံ ရှာဖွေရေး</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap');
-        
-        body, html {
-            font-family: 'Noto Sans Myanmar', sans-serif;
-            scroll-behavior: smooth;
-        }
-        
-        .login-section {
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            flex-direction: column;
         }
-        
-        .login-card {
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            backdrop-filter: blur(4px);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+        .search-container {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            z-index: 10;
         }
-        
-        .hidden {
+        .category-container {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            z-index: 10;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .category-container::-webkit-scrollbar {
             display: none;
         }
-        
-        .modal {
-            transition: opacity 0.25s ease;
+        .category-item {
+            white-space: nowrap;
+            margin: 0 5px;
         }
-        
-        table {
+        #map {
+            height: 100%;
             width: 100%;
-            border-collapse: collapse;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
         }
-        
-        th, td {
-            border: 1px solid #e2e8f0;
-            padding: 8px;
-            text-align: left;
+        .bottom-navbar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            z-index: 10;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
         }
-        
-        th {
-            background-color: #f8fafc;
+        .fab-button {
+            position: absolute;
+            right: 20px;
+            bottom: 80px;
+            z-index: 10;
         }
-        
-        tr:nth-child(even) {
-            background-color: #f1f5f9;
+        .location-button {
+            position: absolute;
+            right: 20px;
+            bottom: 150px;
+            z-index: 10;
         }
-        
-        .dashboard-card {
-            transition: transform 0.3s ease;
+        .layer-button {
+            position: absolute;
+            right: 20px;
+            top: 120px;
+            z-index: 10;
         }
-        
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .tab-active {
-            border-bottom: 2px solid #3b82f6;
-            color: #3b82f6;
-        }
-        
-        @media print {
-            body {
-                width: 100%;
-                height: auto;
-            }
-            
-            button.no-print,
-            .no-print {
-                display: none;
-            }
-            
-            .print-break-inside-avoid {
-                page-break-inside: avoid;
-            }
-            
-            .print-section {
-                display: block !important;
-            }
+        .weather-info {
+            position: absolute;
+            bottom: 80px;
+            left: 10px;
+            background-color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            z-index: 10;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <!-- Login Section -->
-    <section id="login-section" class="login-section flex items-center justify-center p-4">
-        <div class="login-card p-8 w-full max-w-md">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-800 mb-2">ကုန်ပစ္စည်းလက်ခံမှု စီမံခန့်ခွဲရေးစနစ်</h1>
-                <p class="text-gray-600">အကောင့်ဝင်ရန် အချက်အလက်များဖြည့်စွက်ပါ</p>
-            </div>
-            
-            <div class="flex justify-center mb-6">
-                <div class="inline-flex rounded-md" role="group">
-                    <button type="button" id="user-login-tab" class="tab-active px-4 py-2 text-sm font-medium bg-white hover:bg-gray-100">
-                        အသုံးပြုသူ
-                    </button>
-                    <button type="button" id="admin-login-tab" class="px-4 py-2 text-sm font-medium bg-white hover:bg-gray-100">
-                        အက်ဒမင်
-                    </button>
-                </div>
-            </div>
-            
-            <form id="login-form" class="space-y-6">
-                <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700">အသုံးပြုသူအမည်</label>
-                    <input type="text" id="username" name="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">စကားဝှက်</label>
-                    <input type="password" id="password" name="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                
-                <div>
-                    <button type="button" id="login-btn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        ဝင်ရောက်ရန်
-                    </button>
-                </div>
-            </form>
-            
-            <div class="mt-4 text-center">
-                <p id="login-message" class="text-red-500 hidden">အသုံးပြုသူအမည် သို့မဟုတ် စကားဝှက် မှားယွင်းနေပါသည်။</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Main Application Section -->
-    <section id="app-section" class="hidden">
-        <!-- Navigation Header -->
-        <header class="bg-white shadow">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-gray-900">ကုန်ပစ္စည်းလက်ခံမှု စီမံခန့်ခွဲရေးစနစ်</h1>
-                
-                <div class="flex items-center space-x-4">
-                    <span id="user-display" class="text-sm text-gray-700"></span>
-                    <span id="role-display" class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800"></span>
-                    <button id="logout-btn" class="text-sm text-gray-500 hover:text-gray-700 no-print">
-                        ထွက်ခွာရန်
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Navigation Menu -->
-        <nav class="bg-gray-800 no-print">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-shipping-fast text-white text-xl"></i>
-                        </div>
-                        <div class="hidden md:block">
-                            <div class="ml-10 flex items-baseline space-x-4">
-                                <a href="#" id="nav-dashboard" class="nav-link bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">
-                                    ဒက်ရှ်ဘုတ်
-                                </a>
-                                <a href="#" id="nav-shipments" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                                    ကုန်ပစ္စည်းစာရင်းများ
-                                </a>
-                                <a href="#" id="nav-add" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                                    အသစ်ထည့်သွင်းရန်
-                                </a>
-                                <a href="#" id="nav-reports" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                                    အစီရင်ခံစာများ
-                                </a>
-                                <a href="#" id="nav-settings" class="nav-link admin-only text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                                    စီမံခန့်ခွဲမှု
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Content Sections -->
-        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <!-- Dashboard Section -->
-            <section id="dashboard-section" class="content-section">
-                <div class="px-4 py-6 sm:px-0">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-6">ဒက်ရှ်ဘုတ် အနှစ်ချုပ်</h2>
-                    
-                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                        <div class="bg-white overflow-hidden shadow rounded-lg dashboard-card">
-                            <div class="p-5">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                                        <i class="fas fa-box text-white"></i>
-                                    </div>
-                                    <div class="ml-5">
-                                        <p class="text-sm font-medium text-gray-500 truncate">စုစုပေါင်းကုန်ပစ္စည်း</p>
-                                        <p class="mt-1 text-3xl font-semibold text-gray-900" id="total-items">0</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 px-5 py-3">
-                                <div class="text-sm">
-                                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">အသေးစိတ်ကြည့်ရန်</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white overflow-hidden shadow rounded-lg dashboard-card">
-                            <div class="p-5">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
-                                        <i class="fas fa-money-bill-wave text-white"></i>
-                                    </div>
-                                    <div class="ml-5">
-                                        <p class="text-sm font-medium text-gray-500 truncate">စုစုပေါင်းဝင်ငွေ</p>
-                                        <p class="mt-1 text-3xl font-semibold text-gray-900" id="total-income">0 ကျပ်</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 px-5 py-3">
-                                <div class="text-sm">
-                                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">အသေးစိတ်ကြည့်ရန်</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white overflow-hidden shadow rounded-lg dashboard-card">
-                            <div class="p-5">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 bg-red-500 rounded-md p-3">
-                                        <i class="fas fa-chart-line text-white"></i>
-                                    </div>
-                                    <div class="ml-5">
-                                        <p class="text-sm font-medium text-gray-500 truncate">စုစုပေါင်းအသုံးစရိတ်</p>
-                                        <p class="mt-1 text-3xl font-semibold text-gray-900" id="total-expenses">0 ကျပ်</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 px-5 py-3">
-                                <div class="text-sm">
-                                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">အသေးစိတ်ကြည့်ရန်</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white overflow-hidden shadow rounded-lg dashboard-card">
-                            <div class="p-5">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-                                        <i class="fas fa-balance-scale text-white"></i>
-                                    </div>
-                                    <div class="ml-5">
-                                        <p class="text-sm font-medium text-gray-500 truncate">လက်ကျန်ငွေ</p>
-                                        <p class="mt-1 text-3xl font-semibold text-gray-900" id="total-balance">0 ကျပ်</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 px-5 py-3">
-                                <div class="text-sm">
-                                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">အသေးစိတ်ကြည့်ရန်</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-8">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">နောက်ဆုံးထည့်သွင်းထားသောကုန်ပစ္စည်းများ</h3>
-                        <div class="flex flex-col">
-                            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead class="bg-gray-50">
-                                                <tr>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ရက်စွဲ</th>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ပစ္စည်းအမှတ်</th>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">လက်ခံမည့်သူ</th>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">တည်နေရာ</th>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">စုစုပေါင်းတန်ဖိုး</th>
-                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">လုပ်ဆောင်ချက်</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="recent-items" class="bg-white divide-y divide-gray-200">
-                                                <!-- Recent items will be populated here -->
-                                                <tr>
-                                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                                                        မှတ်တမ်းများမရှိသေးပါ။
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Shipments List Section -->
-            <section id="shipments-section" class="content-section hidden">
-                <div class="px-4 py-6 sm:px-0">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-semibold text-gray-800">ကုန်ပစ္စည်းစာရင်းများ</h2>
-                        
-                        <div class="flex space-x-2">
-                            <div class="relative">
-                                <input type="text" id="search-shipments" placeholder="ရှာဖွေရန်..." class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                                <div class="absolute left-3 top-2.5 text-gray-400">
-                                    <i class="fas fa-search"></i>
-                                </div>
-                            </div>
-                            
-                            <button id="export-shipments" class="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 no-print">
-                                <i class="fas fa-download mr-2"></i>ထုတ်ယူရန်
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col">
-                        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead class="bg-gray-50">
-                                            <tr>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ရက်စွဲ</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ပစ္စည်းအမှတ်</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ဖုန်းနံပါတ်</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">တည်နေရာ</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">အရေအတွက်</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">အလေးချိန်</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">စုစုပေါင်းတန်ဖိုး</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">လုပ်ဆောင်ချက်</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="shipments-table" class="bg-white divide-y divide-gray-200">
-                                            <!-- Shipments will be populated here -->
-                                            <tr>
-                                                <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
-                                                    မှတ်တမ်းများမရှိသေးပါ။
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6 flex items-center justify-between">
-                        <div class="text-sm text-gray-700">
-                            စာမျက်နှာ <span id="current-page">1</span> / <span id="total-pages">1</span> 
-                            (<span id="total-records">0</span> မှတ်တမ်း)
-                        </div>
-                        
-                        <div class="flex space-x-2">
-                            <button id="prev-page" class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
-                                <i class="fas fa-chevron-left mr-1"></i> ရှေ့စာမျက်နှာ
-                            </button>
-                            <button id="next-page" class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
-                                နောက်စာမျက်နှာ <i class="fas fa-chevron-right ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Add New Shipment Section -->
-            <section id="add-section" class="content-section hidden">
-                <div class="px-4 py-6 sm:px-0">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-6">ကုန်ပစ္စည်းအသစ်ထည့်သွင်းရန်</h2>
-                    
-                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">ကုန်ပစ္စည်းအချက်အလက်များ</h3>
-                            <p class="mt-1 max-w-2xl text-sm text-gray-500">အချက်အလက်များအားလုံးကို ပြည့်စုံစွာဖြည့်စွက်ပါ။</p>
-                        </div>
-                        
-                        <div class="border-t border-gray-200">
-                            <form id="add-shipment-form">
-                                <dl>
-                                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">ရက်စွဲ</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="date" id="shipment-date" name="date" class="w-full border border-gray-300 px-3 py-2 rounded-md" required>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">ပစ္စည်းအမှတ်</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="text" id="shipment-item-no" name="itemNo" class="w-full border border-gray-300 px-3 py-2 rounded-md" required>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">ဖုန်းနံပါတ်</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="tel" id="shipment-phone" name="phone" class="w-full border border-gray-300 px-3 py-2 rounded-md" required>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">တည်နေရာ (ပို့ဆောင်ရန်)</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="text" id="shipment-location" name="location" class="w-full border border-gray-300 px-3 py-2 rounded-md" required>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">အရေအတွက်</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="number" id="shipment-unit" name="unit" class="w-full border border-gray-300 px-3 py-2 rounded-md" required>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">အလေးချိန် (Kg)</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="number" id="shipment-weight" name="weight" step="0.01" class="w-full border border-gray-300 px-3 py-2 rounded-md" required>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">အတိုင်းအတာ</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="text" id="shipment-dimensions" name="dimensions" placeholder="အလျား x အနံ x အမြင့်" class="w-full border border-gray-300 px-3 py-2 rounded-md" required>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">တစ်ခုချင်းစျေးနှုန်း</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="number" id="shipment-price" name="unitPrice" class="w-full border border-gray-300 px-3 py-2 rounded-md" required>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">စုစုပေါင်းတန်ဖိုး</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="number" id="shipment-total" name="totalAmount" class="w-full border border-gray-300 px-3 py-2 rounded-md" readonly>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">ကုန်ကျစရိတ်</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="number" id="shipment-expenditure" name="expenditure" class="w-full border border-gray-300 px-3 py-2 rounded-md" required>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">လက်ကျန်ငွေပမာဏ</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="number" id="shipment-balance" name="balanceAmount" class="w-full border border-gray-300 px-3 py-2 rounded-md" readonly>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">အစီရင်ခံသူ</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <input type="text" id="shipment-reporter" name="reportBy" class="w-full border border-gray-300 px-3 py-2 rounded-md" required>
-                                        </dd>
-                                    </div>
-                                    
-                                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                        <dt class="text-sm font-medium text-gray-500">မှတ်ချက်</dt>
-                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                            <textarea id="shipment-remarks" name="remarks" rows="3" class="w-full border border-gray-300 px-3 py-2 rounded-md"></textarea>
-                                        </dd>
-                                    </div>
-                                </dl>
-                                
-                                <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                                    <button type="button" id="reset-form" class="mr-2 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        ပြန်စရန်
-                                    </button>
-                                    <button type="submit" id="save-shipment" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        သိမ်းဆည်းရန်
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Reports Section -->
-            <section id="reports-section" class="content-section hidden">
-                <div class="px-4 py-6 sm:px-0">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-6">အစီရင်ခံစာများ</h2>
-                    
-                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6 flex flex-wrap items-center justify-between">
-                            <div>
-                                <h3 class="text-lg leading-6 font-medium text-gray-900">အစီရင်ခံစာအမျိုးအစား ရွေးချယ်ရန်</h3>
-                                <p class="mt-1 max-w-2xl text-sm text-gray-500">အချိန်ကာလ နှင့် အမျိုးအစားအလိုက် အစီရင်ခံစာများကြည့်ရှုနိုင်ပါသည်။</p>
-                            </div>
-                            
-                            <div class="flex space-x-2 mt-3 sm:mt-0">
-                                <button id="export-report" class="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 no-print">
-                                    <i class="fas fa-download mr-2"></i>အစီရင်ခံစာထုတ်ယူရန်
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="border-t border-gray-200">
-                            <div class="px-4 py-5 sm:p-6">
-                                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                                    <div>
-                                        <label for="report-type" class="block text-sm font-medium text-gray-700">အစီရင်ခံစာအမျိုးအစား</label>
-                                        <select id="report-type" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                            <option value="daily">နေ့စဉ်အစီရင်ခံစာ</option>
-                                            <option value="weekly">အပတ်စဉ်အစီရင်ခံစာ</option>
-                                            <option value="monthly">လစဉ်အစီရင်ခံစာ</option>
-                                            <option value="custom">ကိုယ်တိုင်ရွေးချယ်ထားသော ကာလ</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div>
-                                        <label for="report-start-date" class="block text-sm font-medium text-gray-700">စတင်သည့်ရက်စွဲ</label>
-                                        <input type="date" id="report-start-date" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                    </div>
-                                    
-                                    <div id="end-date-container">
-                                        <label for="report-end-date" class="block text-sm font-medium text-gray-700">ပြီးဆုံးသည့်ရက်စွဲ</label>
-                                        <input type="date" id="report-end-date" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-3">လုပ်ဆောင်ချက်</label>
-                                        <button id="generate-report" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            အစီရင်ခံစာပြုလုပ်ရန်
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="report-results" class="mt-8 hidden">
-                        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                            <div class="px-4 py-5 sm:px-6">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="report-title">အစီရင်ခံစာရလဒ်များ</h3>
-                                <p class="mt-1 max-w-2xl text-sm text-gray-500" id="report-period"></p>
-                            </div>
-                            
-                            <div class="border-t border-gray-200">
-                                <div class="px-4 py-5 sm:p-6">
-                                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-                                        <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-200">
-                                            <div class="px-4 py-5 sm:p-6">
-                                                <dl>
-                                                    <dt class="text-sm font-medium text-gray-500 truncate">စုစုပေါင်းကုန်ပစ္စည်း</dt>
-                                                    <dd class="mt-1 text-3xl font-semibold text-gray-900" id="report-total-items">0</dd>
-                                                </dl>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-200">
-                                            <div class="px-4 py-5 sm:p-6">
-                                                <dl>
-                                                    <dt class="text-sm font-medium text-gray-500 truncate">စုစုပေါင်းဝင်ငွေ</dt>
-                                                    <dd class="mt-1 text-3xl font-semibold text-gray-900" id="report-total-income">0 ကျပ်</dd>
-                                                </dl>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-200">
-                                            <div class="px-4 py-5 sm:p-6">
-                                                <dl>
-                                                    <dt class="text-sm font-medium text-gray-500 truncate">စုစုပေါင်းအသုံးစရိတ်</dt>
-                                                    <dd class="mt-1 text-3xl font-semibold text-gray-900" id="report-total-expenses">0 ကျပ်</dd>
-                                                </dl>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mt-6">
-                                        <h4 class="text-lg font-medium text-gray-900 mb-4">အသေးစိတ်ဇယား</h4>
-                                        <div class="flex flex-col">
-                                            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                                                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                                                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                                        <table class="min-w-full divide-y divide-gray-200">
-                                                            <thead class="bg-gray-50">
-                                                                <tr>
-                                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ရက်စွဲ</th>
-                                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ပစ္စည်းအမှတ်</th>
-                                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">တည်နေရာ</th>
-                                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">အရေအတွက်</th>
-                                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">စုစုပေါင်းတန်ဖိုး</th>
-                                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ကုန်ကျစရိတ်</th>
-                                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">လက်ကျန်ငွေ</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody id="report-table" class="bg-white divide-y divide-gray-200">
-                                                                <!-- Report items will be populated here -->
-                                                                <tr>
-                                                                    <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-                                                                        အစီရင်ခံစာရလဒ်များ မရှိသေးပါ။
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Settings Section (Admin Only) -->
-            <section id="settings-section" class="content-section hidden">
-                <div class="px-4 py-6 sm:px-0">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-6">စီမံခန့်ခွဲမှု (အက်ဒမင်သာလျှင်)</h2>
-                    
-                    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">အသုံးပြုသူစီမံခန့်ခွဲမှု</h3>
-                            <p class="mt-1 max-w-2xl text-sm text-gray-500">အသုံးပြုသူအကောင့်များကို ထည့်သွင်း၊ ပြင်ဆင်၊ ပယ်ဖျက်နိုင်ပါသည်။</p>
-                        </div>
-                        
-                        <div class="border-t border-gray-200">
-                            <div class="px-4 py-5 sm:p-6">
-                                <div class="flex justify-end mb-4">
-                                    <button id="add-user-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        <i class="fas fa-user-plus mr-2"></i>အသုံးပြုသူအသစ်ထည့်ရန်
-                                    </button>
-                                </div>
-                                
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">အသုံးပြုသူအမည်</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">အခန်းကဏ္ဍ</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">နောက်ဆုံးဝင်ရောက်ခဲ့ချိန်</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">အခြေအနေ</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">လုပ်ဆောင်ချက်</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="users-table" class="bg-white divide-y divide-gray-200">
-                                        <!-- Users will be populated here -->
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                                        <i class="fas fa-user text-gray-500"></i>
-                                                    </div>
-                                                    <div class="ml-4">
-                                                        <div class="text-sm font-medium text-gray-900">အက်ဒမင်</div>
-                                                        <div class="text-sm text-gray-500">admin@example.com</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">အက်ဒမင်</span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                ယခု
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                    အသုံးပြုနေဆဲ
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3">ပြင်ဆင်ရန်</a>
-                                                <a href="#" class="text-gray-400 cursor-not-allowed">ဖယ်ရှားရန်</a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                                        <i class="fas fa-user text-gray-500"></i>
-                                                    </div>
-                                                    <div class="ml-4">
-                                                        <div class="text-sm font-medium text-gray-900">အသုံးပြုသူ</div>
-                                                        <div class="text-sm text-gray-500">user@example.com</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">အသုံးပြုသူ</span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                ၂၀၂၅-၀၁-၁၅ ၁၂:၃၀
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                    အသုံးပြုနေဆဲ
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3">ပြင်ဆင်ရန်</a>
-                                                <a href="#" class="text-red-600 hover:text-red-900">ဖယ်ရှားရန်</a>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8">
-                        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                            <div class="px-4 py-5 sm:px-6">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900">စနစ်ဆက်တင်များ</h3>
-                                <p class="mt-1 max-w-2xl text-sm text-gray-500">အခြေခံဆက်တင်များနှင့် စနစ်ပြင်ဆင်မွမ်းမံခြင်း</p>
-                            </div>
-                            
-                            <div class="border-t border-gray-200">
-                                <div class="px-4 py-5 sm:p-6">
-                                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                        <div>
-                                            <label for="company-name" class="block text-sm font-medium text-gray-700">ကုမ္ပဏီအမည်</label>
-                                            <input type="text" id="company-name" value="ကုန်ပစ္စည်းလက်ခံမှု စီမံခန့်ခွဲရေး" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="currency" class="block text-sm font-medium text-gray-700">ငွေကြေး</label>
-                                            <select id="currency" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                                <option value="MMK">ကျပ် (MMK)</option>
-                                                <option value="USD">ဒေါ်လာ (USD)</option>
-                                                <option value="THB">ထိုင်းဘတ် (THB)</option>
-                                            </select>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="language" class="block text-sm font-medium text-gray-700">ဘာသာစကား</label>
-                                            <select id="language" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                                <option value="my">မြန်မာ</option>
-                                                <option value="en">အင်္ဂလိပ်</option>
-                                                <option value="th">ထိုင်း</option>
-                                            </select>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="backup-frequency" class="block text-sm font-medium text-gray-700">အရန်သိမ်းဆည်းရန် ကြိမ်နှုန်း</label>
-                                            <select id="backup-frequency" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                                <option value="daily">နေ့စဉ်</option>
-                                                <option value="weekly">အပတ်စဉ်</option>
-                                                <option value="monthly">လစဉ်</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mt-6">
-                                        <button type="button" id="save-settings" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            ဆက်တင်များသိမ်းဆည်းရန်
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </section>
-
-    <!-- Modals -->
-    <div id="shipment-modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                ကုန်ပစ္စည်းအသေးစိတ်
-                            </h3>
-                            <div class="mt-4">
-                                <div id="shipment-details" class="mt-2 space-y-3">
-                                    <!-- Shipment details will be populated here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" class="close-modal w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        ပိတ်ရန်
-                    </button>
-                </div>
+<body>
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="bg-white rounded-full shadow-lg p-3 flex items-center">
+            <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
+            <input type="text" placeholder="ရှာဖွေရန်" class="w-full outline-none bg-transparent" id="search-input">
+            <i class="fas fa-microphone text-gray-500 ml-2"></i>
+            <div class="w-8 h-8 bg-gray-200 rounded-full ml-2 flex items-center justify-center">
+                <i class="fas fa-user text-gray-500"></i>
             </div>
         </div>
     </div>
 
-    <div id="user-modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    <!-- Categories -->
+    <div class="category-container">
+        <div class="flex">
+            <div class="category-item bg-white rounded-full shadow px-4 py-2 flex items-center">
+                <i class="fas fa-utensils mr-2"></i>
+                <span>စားသောက်ဆိုင်များ</span>
             </div>
+            <div class="category-item bg-white rounded-full shadow px-4 py-2 flex items-center">
+                <i class="fas fa-hotel mr-2"></i>
+                <span>ဟိုတယ်များ</span>
+            </div>
+            <div class="category-item bg-white rounded-full shadow px-4 py-2 flex items-center">
+                <i class="fas fa-shopping-bag mr-2"></i>
+                <span>စျေးဝယ်</span>
+            </div>
+            <div class="category-item bg-white rounded-full shadow px-4 py-2 flex items-center">
+                <i class="fas fa-gas-pump mr-2"></i>
+                <span>ဆီဆိုင်</span>
+            </div>
+        </div>
+    </div>
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form id="user-form">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="user-modal-title">
-                                    အသုံးပြုသူအသစ်ထည့်သွင်းရန်
-                                </h3>
-                                <div class="mt-4">
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label for="username-input" class="block text-sm font-medium text-gray-700">အသုံးပြုသူအမည်</label>
-                                            <input type="text" id="username-input" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="email-input" class="block text-sm font-medium text-gray-700">အီးမေးလ်</label>
-                                            <input type="email" id="email-input" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="password-input" class="block text-sm font-medium text-gray-700">စကားဝှက်</label>
-                                            <input type="password" id="password-input" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="role-input" class="block text-sm font-medium text-gray-700">အခန်းကဏ္ဍ</label>
-                                            <select id="role-input" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                                <option value="user">အသုံးပြုသူ</option>
-                                                <option value="admin">အက်ဒမင်</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            သိမ်းဆည်းရန်
-                        </button>
-                        <button type="button" class="close-modal mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                            ပိတ်ရန်
-                        </button>
-                    </div>
-                </form>
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Weather Info -->
+    <div class="weather-info flex items-center">
+        <span class="mr-2">29°</span>
+        <span class="text-green-500">AQI 30</span>
+    </div>
+
+    <!-- Layer Button -->
+    <div class="layer-button bg-white rounded-full shadow-lg p-3 flex items-center justify-center">
+        <i class="fas fa-layers text-gray-600"></i>
+    </div>
+
+    <!-- Location Button -->
+    <div class="location-button bg-white rounded-full shadow-lg p-3 flex items-center justify-center">
+        <i class="fas fa-location-arrow text-blue-600"></i>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab-button bg-teal-500 rounded-full shadow-lg p-4 flex items-center justify-center">
+        <i class="fas fa-directions text-white text-xl"></i>
+    </div>
+
+    <!-- Bottom Navbar -->
+    <div class="bottom-navbar py-2">
+        <div class="flex justify-around">
+            <div class="text-center px-2">
+                <div class="bg-blue-100 rounded-full w-10 h-10 flex items-center justify-center mx-auto">
+                    <i class="fas fa-search text-blue-500"></i>
+                </div>
+                <p class="text-xs mt-1 text-blue-500">ရှာဖွေရန်</p>
+            </div>
+            <div class="text-center px-2">
+                <div class="rounded-full w-10 h-10 flex items-center justify-center mx-auto">
+                    <i class="far fa-bookmark text-gray-500"></i>
+                </div>
+                <p class="text-xs mt-1 text-gray-500">သိမ်းဆည်းပြီး</p>
+            </div>
+            <div class="text-center px-2">
+                <div class="rounded-full w-10 h-10 flex items-center justify-center mx-auto">
+                    <i class="fas fa-plus text-gray-500"></i>
+                </div>
+                <p class="text-xs mt-1 text-gray-500">ပါဝင်ရန်</p>
+            </div>
+            <div class="text-center px-2">
+                <div class="rounded-full w-10 h-10 flex items-center justify-center mx-auto">
+                    <i class="fas fa-briefcase text-gray-500"></i>
+                </div>
+                <p class="text-xs mt-1 text-gray-500">စီးပွားရေး</p>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Demo data
-            let shipments = [];
-            let users = [
-                { id: 1, username: 'အက်ဒမင်', email: 'admin@example.com', password: 'admin123', role: 'admin', lastLogin: 'ယခု', status: 'active' },
-                { id: 2, username: 'အသုံးပြုသူ', email: 'user@example.com', password: 'user123', role: 'user', lastLogin: '၂၀၂၅-၀၁-၁၅ ၁၂:၃၀', status: 'active' }
-            ];
-            let currentUser = null;
-            let isAdmin = false;
-            let currentPage = 1;
-            const itemsPerPage = 10;
+        function initMap() {
+            // Default coordinates (using Yangon as default)
+            const defaultLocation = { lat: 16.8661, lng: 96.1951 };
             
-            // DOM elements
-            const loginSection = document.getElementById('login-section');
-            const appSection = document.getElementById('app-section');
-            const loginForm = document.getElementById('login-form');
-            const loginBtn = document.getElementById('login-btn');
-            const loginMessage = document.getElementById('login-message');
-            const logoutBtn = document.getElementById('logout-btn');
-            const userDisplay = document.getElementById('user-display');
-            const roleDisplay = document.getElementById('role-display');
-            
-            // Navigation tabs
-            const navLinks = document.querySelectorAll('.nav-link');
-            const contentSections = document.querySelectorAll('.content-section');
-            
-            // Login tabs
-            const userLoginTab = document.getElementById('user-login-tab');
-            const adminLoginTab = document.getElementById('admin-login-tab');
-            
-            // Form elements
-            const addShipmentForm = document.getElementById('add-shipment-form');
-            const shipmentUnitInput = document.getElementById('shipment-unit');
-            const shipmentPriceInput = document.getElementById('shipment-price');
-            const shipmentTotalInput = document.getElementById('shipment-total');
-            const shipmentExpenditureInput = document.getElementById('shipment-expenditure');
-            const shipmentBalanceInput = document.getElementById('shipment-balance');
-            const resetFormBtn = document.getElementById('reset-form');
-            
-            // Initialize form date with current date
-            document.getElementById('shipment-date').valueAsDate = new Date();
-            
-            // Login tab switching
-            userLoginTab.addEventListener('click', function() {
-                userLoginTab.classList.add('tab-active');
-                adminLoginTab.classList.remove('tab-active');
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: defaultLocation,
+                zoom: 15,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+                zoomControl: false,
             });
+
+            // Add search functionality
+            const searchInput = document.getElementById("search-input");
+            const searchBox = new google.maps.places.SearchBox(searchInput);
             
-            adminLoginTab.addEventListener('click', function() {
-                adminLoginTab.classList.add('tab-active');
-                userLoginTab.classList.remove('tab-active');
-            });
-            
-            // Login handler
-            loginBtn.addEventListener('click', function() {
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
+            searchBox.addListener("places_changed", () => {
+                const places = searchBox.getPlaces();
                 
-                // Simple authentication
-                const user = users.find(u => u.username === username && u.password === password);
+                if (places.length === 0) return;
                 
-                if (user) {
-                    currentUser = user;
-                    isAdmin = user.role === 'admin';
+                const bounds = new google.maps.LatLngBounds();
+                
+                places.forEach((place) => {
+                    if (!place.geometry || !place.geometry.location) return;
                     
-                    // Update UI based on role
-                    if (!isAdmin) {
-                        document.querySelectorAll('.admin-only').forEach(el => {
-                            el.classList.add('hidden');
-                        });
+                    // Add marker
+                    new google.maps.Marker({
+                        map,
+                        position: place.geometry.location,
+                    });
+                    
+                    if (place.geometry.viewport) {
+                        bounds.union(place.geometry.viewport);
+                    } else {
+                        bounds.extend(place.geometry.location);
                     }
-                    
-                    userDisplay.textContent = user.username;
-                    roleDisplay.textContent = user.role === 'admin' ? 'အက်ဒမင်' : 'အသုံးပြုသူ';
-                    
-                    // Show app section, hide login
-                    loginSection.classList.add('hidden');
-                    appSection.classList.remove('hidden');
-                    
-                    // Show dashboard by default
-                    showSection('dashboard-section');
-                    
-                    // Update dashboard
-                    updateDashboard();
-                } else {
-                    loginMessage.classList.remove('hidden');
-                }
-            });
-            
-            // Logout handler
-            logoutBtn.addEventListener('click', function() {
-                currentUser = null;
-                isAdmin = false;
-                
-                // Reset login form
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-                loginMessage.classList.add('hidden');
-                
-                // Show login section, hide app
-                appSection.classList.add('hidden');
-                loginSection.classList.remove('hidden');
-                
-                // Reset navigation
-                document.querySelectorAll('.nav-link').forEach(link => {
-                    link.classList.remove('bg-gray-900', 'text-white');
-                    link.classList.add('text-gray-300');
-                });
-                document.getElementById('nav-dashboard').classList.add('bg-gray-900', 'text-white');
-            });
-            
-            // Navigation handling
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Update active tab
-                    navLinks.forEach(l => {
-                        l.classList.remove('bg-gray-900', 'text-white');
-                        l.classList.add('text-gray-300', 'hover:bg-gray-700', 'hover:text-white');
-                    });
-                    this.classList.remove('text-gray-300', 'hover:bg-gray-700', 'hover:text-white');
-                    this.classList.add('bg-gray-900', 'text-white');
-                    
-                    // Show corresponding section
-                    const sectionId = this.id.replace('nav-', '') + '-section';
-                    showSection(sectionId);
-                });
-            });
-            
-            function showSection(sectionId) {
-                contentSections.forEach(section => {
-                    section.classList.add('hidden');
-                });
-                document.getElementById(sectionId).classList.remove('hidden');
-                
-                // Additional actions when showing specific sections
-                if (sectionId === 'shipments-section') {
-                    loadShipments();
-                }
-            }
-            
-            // Calculate totals in the form
-            function calculateTotals() {
-                const unit = parseFloat(shipmentUnitInput.value) || 0;
-                const price = parseFloat(shipmentPriceInput.value) || 0;
-                const expenditure = parseFloat(shipmentExpenditureInput.value) || 0;
-                
-                const total = unit * price;
-                shipmentTotalInput.value = total;
-                
-                const balance = total - expenditure;
-                shipmentBalanceInput.value = balance;
-            }
-            
-            shipmentUnitInput.addEventListener('input', calculateTotals);
-            shipmentPriceInput.addEventListener('input', calculateTotals);
-            shipmentExpenditureInput.addEventListener('input', calculateTotals);
-            
-            // Add shipment form handler
-            addShipmentForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const formData = new FormData(addShipmentForm);
-                const shipment = {
-                    id: shipments.length + 1,
-                    date: formData.get('date'),
-                    itemNo: formData.get('itemNo'),
-                    phoneNo: formData.get('phone'),
-                    location: formData.get('location'),
-                    unit: parseInt(formData.get('unit')),
-                    weight: parseFloat(formData.get('weight')),
-                    dimensions: formData.get('dimensions'),
-                    unitPrice: parseFloat(formData.get('unitPrice')),
-                    totalAmount: parseFloat(formData.get('totalAmount')),
-                    expenditure: parseFloat(formData.get('expenditure')),
-                    balanceAmount: parseFloat(formData.get('balanceAmount')),
-                    reportBy: formData.get('reportBy'),
-                    remarks: formData.get('remarks'),
-                    createdBy: currentUser.username,
-                    createdAt: new Date().toISOString()
-                };
-                
-                // Add shipment to data
-                shipments.push(shipment);
-                
-                // Reset form
-                addShipmentForm.reset();
-                document.getElementById('shipment-date').valueAsDate = new Date();
-                
-                // Show success message
-                alert('ကုန်ပစ္စည်းကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ။');
-                
-                // Update dashboard
-                updateDashboard();
-            });
-            
-            // Reset form button
-            resetFormBtn.addEventListener('click', function() {
-                addShipmentForm.reset();
-                document.getElementById('shipment-date').valueAsDate = new Date();
-            });
-            
-            // Update dashboard
-            function updateDashboard() {
-                const totalItems = shipments.length;
-                const totalIncome = shipments.reduce((sum, shipment) => sum + shipment.totalAmount, 0);
-                const totalExpenses = shipments.reduce((sum, shipment) => sum + shipment.expenditure, 0);
-                const totalBalance = totalIncome - totalExpenses;
-                
-                document.getElementById('total-items').textContent = totalItems;
-                document.getElementById('total-income').textContent = `${totalIncome.toLocaleString()} ကျပ်`;
-                document.getElementById('total-expenses').textContent = `${totalExpenses.toLocaleString()} ကျပ်`;
-                document.getElementById('total-balance').textContent = `${totalBalance.toLocaleString()} ကျပ်`;
-                
-                // Update recent items
-                const recentItemsTable = document.getElementById('recent-items');
-                recentItemsTable.innerHTML = '';
-                
-                if (shipments.length === 0) {
-                    recentItemsTable.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                                မှတ်တမ်းများမရှိသေးပါ။
-                            </td>
-                        </tr>
-                    `;
-                } else {
-                    // Get last 5 shipments
-                    const recentShipments = [...shipments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
-                    
-                    recentShipments.forEach(shipment => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(shipment.date)}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${shipment.itemNo}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.phoneNo}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.location}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.totalAmount.toLocaleString()} ကျပ်</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="#" class="text-indigo-600 hover:text-indigo-900 view-shipment" data-id="${shipment.id}">ကြည့်ရှုရန်</a>
-                            </td>
-                        `;
-                        recentItemsTable.appendChild(tr);
-                    });
-                }
-                
-                // Add event listeners for view buttons
-                document.querySelectorAll('.view-shipment').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const id = parseInt(this.getAttribute('data-id'));
-                        const shipment = shipments.find(s => s.id === id);
-                        
-                        if (shipment) {
-                            showShipmentModal(shipment);
-                        }
-                    });
-                });
-            }
-            
-            // Load shipments into table
-            function loadShipments() {
-                const shipmentsTable = document.getElementById('shipments-table');
-                shipmentsTable.innerHTML = '';
-                
-                if (shipments.length === 0) {
-                    shipmentsTable.innerHTML = `
-                        <tr>
-                            <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
-                                မှတ်တမ်းများမရှိသေးပါ။
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-                
-                // Sort by date (newest first)
-                const sortedShipments = [...shipments].sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                // Pagination
-                const startIndex = (currentPage - 1) * itemsPerPage;
-                const endIndex = startIndex + itemsPerPage;
-                const paginatedShipments = sortedShipments.slice(startIndex, endIndex);
-                
-                // Update pagination info
-                document.getElementById('current-page').textContent = currentPage;
-                document.getElementById('total-pages').textContent = Math.ceil(sortedShipments.length / itemsPerPage);
-                document.getElementById('total-records').textContent = sortedShipments.length;
-                
-                // Enable/disable pagination buttons
-                document.getElementById('prev-page').disabled = currentPage === 1;
-                document.getElementById('next-page').disabled = currentPage >= Math.ceil(sortedShipments.length / itemsPerPage);
-                
-                paginatedShipments.forEach(shipment => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(shipment.date)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${shipment.itemNo}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.phoneNo}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.location}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.unit}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.weight} Kg</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.totalAmount.toLocaleString()} ကျပ်</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3 view-shipment" data-id="${shipment.id}">ကြည့်ရှုရန်</a>
-                            <a href="#" class="text-red-600 hover:text-red-900 delete-shipment" data-id="${shipment.id}">ဖျက်ရန်</a>
-                        </td>
-                    `;
-                    shipmentsTable.appendChild(tr);
                 });
                 
-                // Add event listeners for buttons
-                document.querySelectorAll('.view-shipment').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const id = parseInt(this.getAttribute('data-id'));
-                        const shipment = shipments.find(s => s.id === id);
-                        
-                        if (shipment) {
-                            showShipmentModal(shipment);
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.delete-shipment').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const id = parseInt(this.getAttribute('data-id'));
-                        
-                        if (confirm('ဤကုန်ပစ္စည်းကို ဖျက်ရန်သေချာပါသလား?')) {
-                            shipments = shipments.filter(s => s.id !== id);
-                            loadShipments();
-                            updateDashboard();
-                        }
-                    });
-                });
-            }
-            
-            // Pagination handlers
-            document.getElementById('prev-page').addEventListener('click', function() {
-                if (currentPage > 1) {
-                    currentPage--;
-                    loadShipments();
-                }
+                map.fitBounds(bounds);
             });
             
-            document.getElementById('next-page').addEventListener('click', function() {
-                const totalPages = Math.ceil(shipments.length / itemsPerPage);
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    loadShipments();
-                }
-            });
-            
-            // Search functionality
-            document.getElementById('search-shipments').addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                currentPage = 1;
-                
-                if (searchTerm === '') {
-                    loadShipments();
-                    return;
-                }
-                
-                const filteredShipments = shipments.filter(shipment => 
-                    shipment.itemNo.toLowerCase().includes(searchTerm) ||
-                    shipment.phoneNo.toLowerCase().includes(searchTerm) ||
-                    shipment.location.toLowerCase().includes(searchTerm)
-                );
-                
-                const shipmentsTable = document.getElementById('shipments-table');
-                shipmentsTable.innerHTML = '';
-                
-                if (filteredShipments.length === 0) {
-                    shipmentsTable.innerHTML = `
-                        <tr>
-                            <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
-                                ရှာဖွေမှုနှင့်ကိုက်ညီသည့် ရလဒ်မရှိပါ။
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-                
-                // Sort by date (newest first)
-                const sortedShipments = [...filteredShipments].sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                // Update pagination info
-                document.getElementById('current-page').textContent = currentPage;
-                document.getElementById('total-pages').textContent = Math.ceil(sortedShipments.length / itemsPerPage);
-                document.getElementById('total-records').textContent = sortedShipments.length;
-                
-                sortedShipments.forEach(shipment => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(shipment.date)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${shipment.itemNo}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.phoneNo}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.location}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.unit}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.weight} Kg</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.totalAmount.toLocaleString()} ကျပ်</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3 view-shipment" data-id="${shipment.id}">ကြည့်ရှုရန်</a>
-                            <a href="#" class="text-red-600 hover:text-red-900 delete-shipment" data-id="${shipment.id}">ဖျက်ရန်</a>
-                        </td>
-                    `;
-                    shipmentsTable.appendChild(tr);
-                });
-                
-                // Re-add event listeners
-                document.querySelectorAll('.view-shipment').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const id = parseInt(this.getAttribute('data-id'));
-                        const shipment = shipments.find(s => s.id === id);
-                        
-                        if (shipment) {
-                            showShipmentModal(shipment);
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.delete-shipment').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const id = parseInt(this.getAttribute('data-id'));
-                        
-                        if (confirm('ဤကုန်ပစ္စည်းကို ဖျက်ရန်သေချာပါသလား?')) {
-                            shipments = shipments.filter(s => s.id !== id);
-                            loadShipments();
-                            updateDashboard();
-                        }
-                    });
-                });
-            });
-            
-            // Report generation
-            document.getElementById('generate-report').addEventListener('click', function() {
-                const reportType = document.getElementById('report-type').value;
-                const startDate = document.getElementById('report-start-date').value;
-                let endDate = document.getElementById('report-end-date').value;
-                
-                if (!startDate) {
-                    alert('စတင်သည့်ရက်စွဲကို ရွေးချယ်ပါ။');
-                    return;
-                }
-                
-                if (reportType === 'custom' && !endDate) {
-                    alert('ပြီးဆုံးသည့်ရက်စွဲကို ရွေးချယ်ပါ။');
-                    return;
-                }
-                
-                // For non-custom reports, set end date based on report type
-                if (reportType !== 'custom') {
-                    const start = new Date(startDate);
-                    let end = new Date(start);
-                    
-                    if (reportType === 'daily') {
-                        end.setDate(start.getDate());
-                    } else if (reportType === 'weekly') {
-                        end.setDate(start.getDate() + 6);
-                    } else if (reportType === 'monthly') {
-                        end.setMonth(start.getMonth() + 1);
-                        end.setDate(end.getDate() - 1);
-                    }
-                    
-                    endDate = end.toISOString().split('T')[0];
-                    document.getElementById('report-end-date').value = endDate;
-                }
-                
-                // Filter shipments by date range
-                const filteredShipments = shipments.filter(shipment => {
-                    const shipmentDate = new Date(shipment.date);
-                    return shipmentDate >= new Date(startDate) && shipmentDate <= new Date(endDate);
-                });
-                
-                // Update report UI
-                document.getElementById('report-results').classList.remove('hidden');
-                
-                let reportTitle = '';
-                if (reportType === 'daily') {
-                    reportTitle = 'နေ့စဉ်အစီရင်ခံစာ';
-                } else if (reportType === 'weekly') {
-                    reportTitle = 'အပတ်စဉ်အစီရင်ခံစာ';
-                } else if (reportType === 'monthly') {
-                    reportTitle = 'လစဉ်အစီရင်ခံစာ';
-                } else {
-                    reportTitle = 'ကိုယ်တိုင်ရွေးချယ်ထားသော ကာလအစီရင်ခံစာ';
-                }
-                
-                document.getElementById('report-title').textContent = reportTitle;
-                document.getElementById('report-period').textContent = `${formatDate(startDate)} မှ ${formatDate(endDate)} အထိ`;
-                
-                const totalItems = filteredShipments.length;
-                const totalIncome = filteredShipments.reduce((sum, shipment) => sum + shipment.totalAmount, 0);
-                const totalExpenses = filteredShipments.reduce((sum, shipment) => sum + shipment.expenditure, 0);
-                
-                document.getElementById('report-total-items').textContent = totalItems;
-                document.getElementById('report-total-income').textContent = `${totalIncome.toLocaleString()} ကျပ်`;
-                document.getElementById('report-total-expenses').textContent = `${totalExpenses.toLocaleString()} ကျပ်`;
-                
-                // Populate report table
-                const reportTable = document.getElementById('report-table');
-                reportTable.innerHTML = '';
-                
-                if (filteredShipments.length === 0) {
-                    reportTable.innerHTML = `
-                        <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-                                ရွေးချယ်ထားသောကာလအတွင်း မှတ်တမ်းများမရှိပါ။
-                            </td>
-                        </tr>
-                    `;
-                } else {
-                    // Sort by date (newest first)
-                    const sortedShipments = [...filteredShipments].sort((a, b) => new Date(b.date) - new Date(a.date));
-                    
-                    sortedShipments.forEach(shipment => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(shipment.date)}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${shipment.itemNo}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.location}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.unit}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.totalAmount.toLocaleString()} ကျပ်</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.expenditure.toLocaleString()} ကျပ်</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${shipment.balanceAmount.toLocaleString()} ကျပ်</td>
-                        `;
-                        reportTable.appendChild(tr);
-                    });
-                }
-            });
-            
-            // Report type change handler
-            document.getElementById('report-type').addEventListener('change', function() {
-                const endDateContainer = document.getElementById('end-date-container');
-                
-                if (this.value === 'custom') {
-                    endDateContainer.classList.remove('hidden');
-                } else {
-                    endDateContainer.classList.add('hidden');
-                }
-            });
-            
-            // User management
-            document.getElementById('add-user-btn').addEventListener('click', function() {
-                document.getElementById('user-modal-title').textContent = 'အသုံးပြုသူအသစ်ထည့်သွင်းရန်';
-                document.getElementById('username-input').value = '';
-                document.getElementById('email-input').value = '';
-                document.getElementById('password-input').value = '';
-                document.getElementById('role-input').value = 'user';
-                
-                document.getElementById('user-modal').classList.remove('hidden');
-            });
-            
-            document.getElementById('user-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const username = document.getElementById('username-input').value;
-                const email = document.getElementById('email-input').value;
-                const password = document.getElementById('password-input').value;
-                const role = document.getElementById('role-input').value;
-                
-                // Add new user
-                const newUser = {
-                    id: users.length + 1,
-                    username,
-                    email,
-                    password,
-                    role,
-                    lastLogin: 'မရှိသေးပါ',
-                    status: 'active'
-                };
-                
-                users.push(newUser);
-                
-                // Close modal
-                document.getElementById('user-modal').classList.add('hidden');
-                
-                // Update users table
-                updateUsersTable();
-                
-                alert('အသုံးပြုသူအသစ် အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ။');
-            });
-            
-            // Settings save handler
-            document.getElementById('save-settings').addEventListener('click', function() {
-                alert('ဆက်တင်များ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။');
-            });
-            
-            // Modal close buttons
-            document.querySelectorAll('.close-modal').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.getElementById('shipment-modal').classList.add('hidden');
-                    document.getElementById('user-modal').classList.add('hidden');
-                });
-            });
-            
-            // Show shipment details modal
-            function showShipmentModal(shipment) {
-                const modal = document.getElementById('shipment-modal');
-                const detailsContainer = document.getElementById('shipment-details');
-                
-                detailsContainer.innerHTML = `
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">ရက်စွဲ</h4>
-                            <p class="mt-1 text-sm text-gray-900">${formatDate(shipment.date)}</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">ပစ္စည်းအမှတ်</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.itemNo}</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">ဖုန်းနံပါတ်</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.phoneNo}</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">တည်နေရာ (ပို့ဆောင်ရန်)</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.location}</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">အရေအတွက်</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.unit}</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">အလေးချိန်</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.weight} Kg</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">အတိုင်းအတာ</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.dimensions}</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">တစ်ခုချင်းစျေးနှုန်း</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.unitPrice.toLocaleString()} ကျပ်</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">စုစုပေါင်းတန်ဖိုး</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.totalAmount.toLocaleString()} ကျပ်</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">ကုန်ကျစရိတ်</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.expenditure.toLocaleString()} ကျပ်</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">လက်ကျန်ငွေပမာဏ</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.balanceAmount.toLocaleString()} ကျပ်</p>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-500">အစီရင်ခံသူ</h4>
-                            <p class="mt-1 text-sm text-gray-900">${shipment.reportBy}</p>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <h4 class="text-sm font-medium text-gray-500">မှတ်ချက်</h4>
-                        <p class="mt-1 text-sm text-gray-900">${shipment.remarks || 'မှတ်ချက်မရှိပါ'}</p>
-                    </div>
-                    <div class="mt-4 border-t pt-4 text-xs text-gray-500">
-                        <p>ထည့်သွင်းသူ: ${shipment.createdBy}</p>
-                        <p>ထည့်သွင်းသည့်အချိန်: ${new Date(shipment.createdAt).toLocaleString()}</p>
-                    </div>
-                `;
-                
-                modal.classList.remove('hidden');
-            }
-            
-            // Update users table
-            function updateUsersTable() {
-                const usersTable = document.getElementById('users-table');
-                usersTable.innerHTML = '';
-                
-                users.forEach(user => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-user text-gray-500"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">${user.username}</div>
-                                    <div class="text-sm text-gray-500">${user.email}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
-                                ${user.role === 'admin' ? 'အက်ဒမင်' : 'အသုံးပြုသူ'}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            ${user.lastLogin}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                အသုံးပြုနေဆဲ
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3 edit-user" data-id="${user.id}">ပြင်ဆင်ရန်</a>
-                            <a href="#" class="${user.id === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-red-600 hover:text-red-900 delete-user'}" data-id="${user.id}">ဖယ်ရှားရန်</a>
-                        </td>
-                    `;
-                    usersTable.appendChild(tr);
-                });
-                
-                // Add event listeners
-                document.querySelectorAll('.edit-user').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const id = parseInt(this.getAttribute('data-id'));
-                        const user = users.find(u => u.id === id);
-                        
-                        if (user) {
-                            document.getElementById('user-modal-title').textContent = 'အသုံးပြုသူအချက်အလက်ပြင်ဆင်ရန်';
-                            document.getElementById('username-input').value = user.username;
-                            document.getElementById('email-input').value = user.email;
-                            document.getElementById('password-input').value = user.password;
-                            document.getElementById('role-input').value = user.role;
+            // Add location button functionality
+            document.querySelector(".location-button").addEventListener("click", () => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const pos = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                            };
+                            map.setCenter(pos);
+                            map.setZoom(17);
                             
-                            document.getElementById('user-modal').classList.remove('hidden');
+                            // Add marker for current location
+                            new google.maps.Marker({
+                                position: pos,
+                                map: map,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 10,
+                                    fillColor: "#4285F4",
+                                    fillOpacity: 1,
+                                    strokeColor: "#FFFFFF",
+                                    strokeWeight: 2,
+                                },
+                            });
+                        },
+                        () => {
+                            alert("သင့်တည်နေရာကို ရယူရန် ခွင့်ပြုချက်လိုအပ်ပါသည်။");
                         }
-                    });
-                });
-                
-                document.querySelectorAll('.delete-user').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const id = parseInt(this.getAttribute('data-id'));
-                        
-                        if (confirm('ဤအသုံးပြုသူကို ဖယ်ရှားရန် သေချာပါသလား?')) {
-                            users = users.filter(u => u.id !== id);
-                            updateUsersTable();
-                        }
-                    });
-                });
-            }
-            
-            // Export functions
-            document.getElementById('export-shipments').addEventListener('click', function() {
-                print();
-            });
-            
-            document.getElementById('export-report').addEventListener('click', function() {
-                if (document.getElementById('report-results').classList.contains('hidden')) {
-                    alert('အစီရင်ခံစာကို ဦးစွာ ပြုလုပ်ပါ။');
-                    return;
+                    );
+                } else {
+                    alert("သင့်ဘရောက်ဇာသည် Geolocation ကို ထောက်ပံ့မထားပါ။");
                 }
-                print();
             });
             
-            // Helper function to format date
-            function formatDate(dateString) {
-                if (!dateString) return '';
-                const date = new Date(dateString);
-                return date.toLocaleDateString('my-MM', { year: 'numeric', month: '2-digit', day: '2-digit' });
-            }
-            
-            // Sample data for demo
-            function loadSampleData() {
-                shipments = [
-                    {
-                        id: 1,
-                        date: '2025-01-15',
-                        itemNo: 'ITEM001',
-                        phoneNo: '09123456789',
-                        location: 'ရန်ကုန်',
-                        unit: 5,
-                        weight: 10.5,
-                        dimensions: '30x20x15',
-                        unitPrice: 5000,
-                        totalAmount: 25000,
-                        expenditure: 5000,
-                        balanceAmount: 20000,
-                        reportBy: 'မောင်မောင်',
-                        remarks: 'အထူးအမှာ',
-                        createdBy: 'အက်ဒမင်',
-                        createdAt: '2025-01-15T09:30:00'
-                    },
-                    {
-                        id: 2,
-                        date: '2025-01-16',
-                        itemNo: 'ITEM002',
-                        phoneNo: '09987654321',
-                        location: 'မန္တလေး',
-                        unit: 3,
-                        weight: 7.2,
-                        dimensions: '25x15x10',
-                        unitPrice: 6000,
-                        totalAmount: 18000,
-                        expenditure: 4000,
-                        balanceAmount: 14000,
-                        reportBy: 'စိုးစိုး',
-                        remarks: '',
-                        createdBy: 'အက်ဒမင်',
-                        createdAt: '2025-01-16T11:45:00'
-                    },
-                    {
-                        id: 3,
-                        date: '2025-01-17',
-                        itemNo: 'ITEM003',
-                        phoneNo: '09555666777',
-                        location: 'နေပြည်တော်',
-                        unit: 2,
-                        weight: 4.8,
-                        dimensions: '20x15x10',
-                        unitPrice: 7500,
-                        totalAmount: 15000,
-                        expenditure: 3500,
-                        balanceAmount: 11500,
-                        reportBy: 'အေးအေး',
-                        remarks: 'ဂရုတစိုက်ကိုင်တွယ်ရန်',
-                        createdBy: 'အသုံးပြုသူ',
-                        createdAt: '2025-01-17T14:20:00'
-                    }
-                ];
-                
-                updateDashboard();
-            }
-            
-            // Load sample data for demo
-            loadSampleData();
-        });
+            // Add category filter functionality
+            const categoryItems = document.querySelectorAll(".category-item");
+            categoryItems.forEach((item) => {
+                item.addEventListener("click", function() {
+                    const categoryText = this.querySelector("span").textContent;
+                    searchInput.value = categoryText;
+                    
+                    // Simulate search
+                    const event = new Event("places_changed");
+                    searchBox.dispatchEvent(event);
+                });
+            });
+        }
     </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDI9QayA38zpkwpGVCFtUQ3WxUkgpwFvEk&libraries=places&callback=initMap&language=my" async defer></script>
 </body>
 </html>
