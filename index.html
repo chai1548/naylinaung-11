@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>သယ်ယူပို့ဆောင်ရေး နှုန်းထား တွက်ချက်ခြင်း</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Myanmar', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-size: 10px; /* Base font size 10px */
+        }
+        
+        /* Ultra-compact weight display */
+        .weight-container {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            padding: 2px;
+            width: 70px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .weight-header {
+            font-size: 8px;
+            color: #555;
+            text-align: center;
+            margin-bottom: 1px;
+            font-weight: bold;
+        }
+
+        .weight-values {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .weight-value {
+            font-size: 9px;
+            text-align: center;
+            background-color: white;
+            border-radius: 2px;
+            padding: 1px 2px;
+        }
+
+        .weight-unit {
+            font-size: 6px;
+            color: #777;
+            text-align: right;
+            margin-top: 1px;
+        }
+        
+        /* Glass effect styling */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            font-size: 10px;
+        }
+        
+        /* Card styling */
+        .rate-card {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            font-size: 10px;
+            padding: 12px;
+        }
+        
+        .rate-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Category cards */
+        .electronic-card, .food-card, .cosmetic-card, .textile-card {
+            font-size: 10px;
+        }
+
+        .electronic-card {
+            background: linear-gradient(135deg, #f4f9ff, #e8f3ff);
+            border-left: 3px solid #3b82f6;
+        }
+
+        .food-card {
+            background: linear-gradient(135deg, #f0fff4, #dcfce7);
+            border-left: 3px solid #22c55e;
+        }
+
+        .cosmetic-card {
+            background: linear-gradient(135deg, #fff1f2, #fecdd3);
+            border-left: 3px solid #ec4899;
+        }
+
+        .textile-card {
+            background: linear-gradient(135deg, #fff8f0, #ffeadd);
+            border-left: 3px solid #f97316;
+        }
+        
+        /* Active tab */
+        .tab-active {
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+        }
+        
+        /* Section title */
+        .section-title {
+            position: relative;
+            padding-left: 15px;
+            font-size: 12px;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            border-radius: 2px;
+        }
+        
+        /* Loading spinner */
+        .loading-spinner {
+            border: 3px solid rgba(79, 70, 229, 0.1);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border-left-color: #4F46E5;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Badges */
+        .price-badge {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 9px;
+        }
+        
+        .route-badge {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+            font-weight: 500;
+        }
+        
+        .type-badge {
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            color: white;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+            font-weight: 500;
+        }
+
+        .electronic-badge {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+        
+        .food-badge {
+            background: linear-gradient(135deg, #22c55e, #15803d);
+        }
+        
+        .cosmetic-badge {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+        }
+        
+        .textile-badge {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+
+        /* Input fields */
+        .input-field {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 10px;
+            padding: 8px;
+        }
+
+        .input-field:focus {
+            background: white;
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        /* Buttons */
+        .btn-primary, .btn-secondary {
+            font-size: 10px;
+            padding: 8px 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6B7280, #4B5563);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(107, 114, 128, 0.3);
+        }
+
+        /* Floating header */
+        .floating-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            font-size: 10px;
+        }
+
+        /* Compact spacing */
+        .compact-grid {
+            gap: 8px;
+        }
+
+        .compact-space {
+            margin-bottom: 12px;
+        }
+
+        .compact-padding {
+            padding: 8px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                font-size: 9px;
+            }
+            
+            .section-title {
+                font-size: 11px;
+            }
+            
+            .price-badge {
+                font-size: 8px;
+            }
+            
+            .route-badge, .type-badge {
+                font-size: 7px;
+            }
+            
+            .rate-card {
+                padding: 8px;
+            }
+        }
+
+        @media print {
+            body { 
+                background: white;
+                font-size: 10px !important;
+            }
+            .no-print { 
+                display: none; 
+            }
+            .print-full { 
+                width: 100% !important; 
+                max-width: 100% !important; 
+            }
+            .rate-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                margin: 4px 0;
+                box-shadow: none;
+                border: 1px solid #eaeaea;
+                font-size: 10px !important;
+            }
+            .glass-effect {
+                background: white;
+                backdrop-filter: none;
+                border: none;
+                box-shadow: none;
+            }
+            .section-title {
+                color: #000;
+                font-size: 12px !important;
+            }
+            .route-badge, .type-badge, .price-badge {
+                background: none;
+                border: 1px solid #ccc;
+                color: #000;
+                font-size: 8px !important;
+            }
+            .food-card, .cosmetic-card, .electronic-card, .textile-card {
+                background: white;
+                border-left-width: 2px;
+            }
+        }
+
+        /* Additional compact styling */
+        h1, h2, h3 {
+            line-height: 1.2;
+        }
+
+        .text-3xl {
+            font-size: 18px !important;
+        }
+
+        .text-2xl {
+            font-size: 14px !important;
+        }
+
+        .text-xl {
+            font-size: 12px !important;
+        }
+
+        .text-lg {
+            font-size: 11px !important;
+        }
+
+        .text-base {
+            font-size: 10px !important;
+        }
+
+        .text-sm {
+            font-size: 9px !important;
+        }
+
+        .text-xs {
+            font-size: 8px !important;
+        }
+
+        .py-6 {
+            padding-top: 12px !important;
+            padding-bottom: 12px !important;
+        }
+
+        .py-3 {
+            padding-top: 6px !important;
+            padding-bottom: 6px !important;
+        }
+
+        .px-4 {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+        }
+
+        .px-6 {
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+        }
+
+        .mb-8 {
+            margin-bottom: 16px !important;
+        }
+
+        .mb-6 {
+            margin-bottom: 12px !important;
+        }
+
+        .mb-4 {
+            margin-bottom: 8px !important;
+        }
+
+        .gap-6 {
+            gap: 12px !important;
+        }
+
+        .gap-4 {
+            gap: 8px !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+    <header class="glass-effect shadow-lg compact-space floating-header no-print">
+        <div class="container mx-auto compact-padding">
+            <div class="text-center">
+                <p class="text-white text-lg opacity-90">မြန်မာ - ထိုင်း တင်ပို့မှု နှုန်းထားများ</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Print-only header -->
+    <div class="hidden print:block text-center compact-space">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">သယ်ယူပို့ဆောင်ရေး နှုန်းထား တွက်ချက်ခြင်း</h1>
+        <p class="text-gray-700 text-lg">မြန်မာ - ထိုင်း တင်ပို့မှု နှုန်းထားများ</p>
+    </div>
+
+    <div class="container mx-auto compact-padding">
+        <!-- Tabs -->
+        <div class="flex justify-center compact-space no-print">
+            <div class="glass-effect rounded-lg compact-padding">
+                <button id="user-tab" class="compact-padding rounded-md tab-active transition-all duration-300 mr-2" onclick="switchTab('user')">
+                    <i class="fas fa-user mr-1"></i>အသုံးပြုသူ မြင်ကွင်း
+                </button>
+                <button id="admin-tab" class="compact-padding rounded-md transition-all duration-300" onclick="switchTab('admin')">
+                    <i class="fas fa-cog mr-1"></i>စီမံခန့်ခွဲသူ စာမျက်နှာ
+                </button>
+            </div>
+        </div>
+
+        <!-- Login Panel -->
+        <div id="login-panel" class="hidden">
+            <div class="max-w-md mx-auto glass-effect rounded-xl shadow-xl compact-padding compact-space">
+                <h2 class="text-xl font-bold compact-space text-center text-white">
+                    <i class="fas fa-lock mr-1"></i>စီမံခန့်ခွဲသူ အကောင့်ဝင်ရန်
+                </h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="email">အီးမေးလ်</label>
+                        <input type="email" id="email" class="w-full input-field rounded-lg" placeholder="အီးမေးလ် ထည့်သွင်းပါ">
+                    </div>
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="password">စကားဝှက်</label>
+                        <input type="password" id="password" class="w-full input-field rounded-lg" placeholder="စကားဝှက် ထည့်သွင်းပါ">
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                        <button onclick="login()" class="btn-primary text-white font-medium rounded-lg transition duration-300">
+                            <i class="fas fa-sign-in-alt mr-1"></i>အကောင့်ဝင်ရန်
+                        </button>
+                        <div id="login-error" class="text-red-300 text-center hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Panel -->
+        <div id="user-panel">
+            <!-- Filter Section -->
+            <div class="glass-effect rounded-xl shadow-lg compact-padding compact-space no-print">
+                <h2 class="text-xl font-bold compact-space section-title text-white">
+                    <i class="fas fa-filter mr-1"></i>စစ်ထုတ်ကြည့်ရှုရန်
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 compact-grid">
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="route-select">လမ်းကြောင်း</label>
+                        <select id="route-select" class="w-full input-field rounded-lg" onchange="filterRates()">
+                            <option value="YGN-BKK">ရန်ကုန် - ဘန်ကောက်</option>
+                            <option value="YGN-CNX">ရန်ကုန် - ချင်းမိုင်</option>
+                            <option value="MWD-BKK">မြဝတီ - ဘန်ကောက်</option>
+                            <option value="MDY-BKK">မန္တလေး - ဘန်ကောက်</option>
+                            <option value="HPA-BKK">ဘားအံ - ဘန်ကောက်</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="type-select">ပစ္စည်းအမျိုးအစား</label>
+                        <select id="type-select" class="w-full input-field rounded-lg" onchange="filterRates()">
+                            <option value="all">အားလုံး</option>
+                            <option value="Food">အစားအသောက်</option>
+                            <option value="Cosmetic">အလှကုန်ပစ္စည်း</option>
+                            <option value="Textile">အထည်အလိပ်</option>
+                            <option value="Electronic">လျှပ်စစ်ပစ္စည်း</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="weight-search">အလေးချိန်ရှာဖွေရန်</label>
+                        <input type="text" id="weight-search" placeholder="အလေးချိန် ရိုက်ထည့်ပါ..." class="w-full input-field rounded-lg" oninput="filterRates()">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filtered Results Tag -->
+            <div class="flex items-center justify-between compact-space">
+                <h2 class="text-xl font-bold section-title text-white">
+                    <i class="fas fa-list mr-1"></i>နှုန်းထားများ
+                </h2>
+                <div id="result-count" class="text-white text-lg no-print"></div>
+            </div>
+            
+            <div id="loading-indicator" class="flex justify-center items-center py-8 hidden">
+                <div class="loading-spinner"></div>
+                <span class="ml-2 text-white text-lg">ဒေတာများ ရယူနေသည်...</span>
+            </div>
+            
+            <div id="results-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 compact-grid">
+                <!-- Shipping rates will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="hidden">
+            <div class="glass-effect rounded-xl shadow-lg compact-padding compact-space">
+                <div class="flex justify-between items-center compact-space">
+                    <h2 class="text-xl font-bold section-title text-white">
+                        <i class="fas fa-cogs mr-1"></i>နှုန်းထားများ စီမံခန့်ခွဲရန်
+                    </h2>
+                    <button onclick="logout()" class="btn-secondary text-white font-medium rounded-lg transition duration-300">
+                        <i class="fas fa-sign-out-alt mr-1"></i>အကောင့်ထွက်ရန်
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 compact-grid compact-space">
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="admin-route">လမ်းကြောင်း</label>
+                        <select id="admin-route" class="w-full input-field rounded-lg">
+                            <option value="YGN-BKK">ရန်ကုန် - ဘန်ကောက်</option>
+                            <option value="YGN-CNX">ရန်ကုန် - ချင်းမိုင်</option>
+                            <option value="MWD-BKK">မြဝတီ - ဘန်ကောက်</option>
+                            <option value="MDY-BKK">မန္တလေး - ဘန်ကောက်</option>
+                            <option value="HPA-BKK">ဘားအံ - ဘန်ကောက်</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="admin-type">ပစ္စည်းအမျိုးအစား</label>
+                        <select id="admin-type" class="w-full input-field rounded-lg">
+                            <option value="Food">အစားအသောက်</option>
+                            <option value="Cosmetic">အလှကုန်ပစ္စည်း</option>
+                            <option value="Textile">အထည်အလိပ်</option>
+                            <option value="Electronic">လျှပ်စစ်ပစ္စည်း</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 compact-grid compact-space">
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="admin-weight">အလေးချိန် (ကီလိုဂရမ်)</label>
+                        <input type="text" id="admin-weight" placeholder="ဥပမာ - 1 သို့ 30-40" class="w-full input-field rounded-lg">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="admin-bkk">ဘန်ကောက် နှုန်းထား</label>
+                        <input type="text" id="admin-bkk" placeholder="ဘန်ကောက် နှုန်းထား" class="w-full input-field rounded-lg">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 compact-grid compact-space">
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="admin-other">အရှေ့နောက်မြောက် နှုန်းထား</label>
+                        <input type="text" id="admin-other" placeholder="အရှေနောက်မြောက် နှုန်းထား" class="w-full input-field rounded-lg">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="admin-remote">တောင်ပိုင်း နှုန်းထား</label>
+                        <input type="text" id="admin-remote" placeholder="တောင်ပိုင်း နှုန်းထား" class="w-full input-field rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 compact-grid compact-space hidden" id="electronic-fields">
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="admin-used">အဟောင်း နှုန်းထား</label>
+                        <input type="text" id="admin-used" placeholder="အဟောင်း နှုန်းထား" class="w-full input-field rounded-lg">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-white mb-1 font-medium" for="admin-new">အသစ် နှုန်းထား</label>
+                        <input type="text" id="admin-new" placeholder="အသစ် နှုန်းထား" class="w-full input-field rounded-lg">
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="addRate()" class="btn-primary text-white font-medium rounded-lg transition duration-300">
+                        <i class="fas fa-plus mr-1"></i>နှုန်းထားအသစ် ထည့်သွင်းရန်
+                    </button>
+                    <button onclick="updateRate()" class="bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition duration-300" style="padding: 8px 12px; font-size: 10px;">
+                        <i class="fas fa-edit mr-1"></i>နှုန်းထား ပြင်ဆင်ရန်
+                    </button>
+                    <button onclick="clearForm()" class="btn-secondary text-white font-medium rounded-lg transition duration-300">
+                        <i class="fas fa-broom mr-1"></i>ရှင်းလင်းရန်
+                    </button>
+                </div>
+            </div>
+            
+            <h2 class="text-xl font-bold compact-space section-title text-white">
+                <i class="fas fa-database mr-1"></i>လက်ရှိနှုန်းထားများ
+            </h2>
+            
+            <div id="admin-loading-indicator" class="flex justify-center items-center py-8 hidden">
+                <div class="loading-spinner"></div>
+                <span class="ml-2 text-white text-lg">ဒေတာများ ရယူနေသည်...</span>
+            </div>
+            
+            <div id="admin-results" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 compact-grid">
+                <!-- Admin shipping rates will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-12 py-4 text-center text-white text-xs opacity-70 no-print">
+        <p>&copy; 2025 သယ်ယူပို့ဆောင်ရေး နှုန်းထား တွက်ချက်ခြင်း စီမံကိန်း</p>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/firebase@9.6.10/firebase-app-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@9.6.10/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB49vRPX8YaWuTP5GS3lsBDqdAaz_hJYAw",
+            authDomain: "onlineshop-849c8.firebaseapp.com",
+            databaseURL: "https://onlineshop-849c8.firebaseio.com",
+            projectId: "onlineshop-849c8",
+            storageBucket: "onlineshop-849c8.appspot.com",
+            messagingSenderId: "883512833370",
+            appId: "1:883512833370:web:a1c8412b158f8744afef63"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const shippingRatesRef = database.ref('shippingRates');
+        const auth = firebase.auth();
+
+        // Global variables
+        let shippingRates = {};
+        let currentEditRate = null;
+        let isLoggedIn = false;
+
+        // Check authentication state on page load
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                isLoggedIn = true;
+                document.getElementById('login-panel').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                loadAdminRates();
+            } else {
+                isLoggedIn = false;
+            }
+        });
+
+        // Toggle electronic fields visibility
+        document.getElementById('admin-type').addEventListener('change', function() {
+            const electronicFields = document.getElementById('electronic-fields');
+            const standardFields = ['admin-bkk', 'admin-other', 'admin-remote'];
+
+            if (this.value === 'Electronic') {
+                electronicFields.classList.remove('hidden');
+                standardFields.forEach(id => document.getElementById(id).parentElement.parentElement.classList.add('hidden'));
+            } else {
+                electronicFields.classList.add('hidden');
+                standardFields.forEach(id => document.getElementById(id).parentElement.parentElement.classList.remove('hidden'));
+            }
+        });
+        
+        // Initialize default data with corrected prices from PDFs
+        const defaultRates = {
+            "YGN-BKK": {
+                "Food": [
+      {"Kg": "1", "BKK": "60", "OtherCity": "70", "RemoteArea": "75", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Food"},
+      {"Kg": "2", "BKK": "120", "OtherCity": "140", "RemoteArea": "150", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "3", "BKK": "180", "OtherCity": "210", "RemoteArea": "225", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "4", "BKK": "240", "OtherCity": "280", "RemoteArea": "300", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "5", "BKK": "300", "OtherCity": "350", "RemoteArea": "375", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "6", "BKK": "360", "OtherCity": "420", "RemoteArea": "450", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "7", "BKK": "420", "OtherCity": "490", "RemoteArea": "525", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "8", "BKK": "480", "OtherCity": "560", "RemoteArea": "600", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "9", "BKK": "540", "OtherCity": "630", "RemoteArea": "675", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "10", "BKK": "600", "OtherCity": "700", "RemoteArea": "750", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "11", "BKK": "638", "OtherCity": "748", "RemoteArea": "803", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "12", "BKK": "696", "OtherCity": "816", "RemoteArea": "876", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "13", "BKK": "741", "OtherCity": "871", "RemoteArea": "936", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "14", "BKK": "770", "OtherCity": "910", "RemoteArea": "980", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "15", "BKK": "825", "OtherCity": "975", "RemoteArea": "1050", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "16", "BKK": "880", "OtherCity": "1040", "RemoteArea": "1120", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "17", "BKK": "935", "OtherCity": "1105", "RemoteArea": "1190", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "18", "BKK": "990", "OtherCity": "1170", "RemoteArea": "1260", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "19", "BKK": "1007", "OtherCity": "1197", "RemoteArea": "1292", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "20", "BKK": "1020", "OtherCity": "1220", "RemoteArea": "1320", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "21", "BKK": "1050", "OtherCity": "1260", "RemoteArea": "1365", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "22", "BKK": "1100", "OtherCity": "1320", "RemoteArea": "1430", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "23", "BKK": "1150", "OtherCity": "1380", "RemoteArea": "1495", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "24", "BKK": "1200", "OtherCity": "1440", "RemoteArea": "1560", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "25", "BKK": "1250", "OtherCity": "1500", "RemoteArea": "1625", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "26", "BKK": "1300", "OtherCity": "1560", "RemoteArea": "1690", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "27", "BKK": "1350", "OtherCity": "1620", "RemoteArea": "1755", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "28", "BKK": "1400", "OtherCity": "1680", "RemoteArea": "1820", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "29", "BKK": "1450", "OtherCity": "1740", "RemoteArea": "1885", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "30", "BKK": "1500", "OtherCity": "1800", "RemoteArea": "1950", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "30-40", "BKK": "45/kg", "OtherCity": "55/kg", "RemoteArea": "60/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "40-50", "BKK": "43/kg", "OtherCity": "53/kg", "RemoteArea": "58/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "50-70", "BKK": "40/kg", "OtherCity": "50/kg", "RemoteArea": "55/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "70-100", "BKK": "35/kg", "OtherCity": "45/kg", "RemoteArea": "50/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "100", "BKK": "33/kg", "OtherCity": "43/kg", "RemoteArea": "48/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "200", "BKK": "32/kg", "OtherCity": "42/kg", "RemoteArea": "47/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "300", "BKK": "30/kg", "OtherCity": "40/kg", "RemoteArea": "45/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "300-1000", "BKK": "28/kg", "OtherCity": "38/kg", "RemoteArea": "43/kg", "DeliveryBy": "", "type": "Food"}
+    ],
+    "Cosmetic": [
+      {"Kg": "1", "BKK": "70", "OtherCity": "80", "RemoteArea": "85", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "2", "BKK": "140", "OtherCity": "160", "RemoteArea": "170", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "3", "BKK": "210", "OtherCity": "240", "RemoteArea": "255", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "4", "BKK": "280", "OtherCity": "320", "RemoteArea": "340", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "5", "BKK": "350", "OtherCity": "400", "RemoteArea": "425", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "6", "BKK": "420", "OtherCity": "480", "RemoteArea": "510", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "7", "BKK": "490", "OtherCity": "560", "RemoteArea": "595", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "8", "BKK": "560", "OtherCity": "640", "RemoteArea": "680", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "9", "BKK": "630", "OtherCity": "720", "RemoteArea": "765", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "10", "BKK": "700", "OtherCity": "800", "RemoteArea": "850", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "11", "BKK": "715", "OtherCity": "825", "RemoteArea": "880", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "12", "BKK": "780", "OtherCity": "900", "RemoteArea": "960", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "13", "BKK": "845", "OtherCity": "975", "RemoteArea": "1040", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "14", "BKK": "910", "OtherCity": "1050", "RemoteArea": "1120", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "15", "BKK": "975", "OtherCity": "1125", "RemoteArea": "1200", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "16", "BKK": "1040", "OtherCity": "1200", "RemoteArea": "1280", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "17", "BKK": "1105", "OtherCity": "1275", "RemoteArea": "1360", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "18", "BKK": "1170", "OtherCity": "1350", "RemoteArea": "1440", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "19", "BKK": "1235", "OtherCity": "1425", "RemoteArea": "1520", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "20", "BKK": "1300", "OtherCity": "1500", "RemoteArea": "1600", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "21", "BKK": "1323", "OtherCity": "1533", "RemoteArea": "1638", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "22", "BKK": "1364", "OtherCity": "1584", "RemoteArea": "1694", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "23", "BKK": "1380", "OtherCity": "1610", "RemoteArea": "1725", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "24", "BKK": "1440", "OtherCity": "1680", "RemoteArea": "1800", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "25", "BKK": "1500", "OtherCity": "1750", "RemoteArea": "1875", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "26", "BKK": "1560", "OtherCity": "1820", "RemoteArea": "1950", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "27", "BKK": "1620", "OtherCity": "1890", "RemoteArea": "2025", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "28", "BKK": "1680", "OtherCity": "1960", "RemoteArea": "2100", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "29", "BKK": "1740", "OtherCity": "2030", "RemoteArea": "2175", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "30", "BKK": "1800", "OtherCity": "2100", "RemoteArea": "2250", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "30-50", "BKK": "58/kg", "OtherCity": "68/kg", "RemoteArea": "73/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "50-100", "BKK": "56/kg", "OtherCity": "66/kg", "RemoteArea": "71/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "200", "BKK": "54/kg", "OtherCity": "64/kg", "RemoteArea": "69/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "300", "BKK": "52/kg", "OtherCity": "62/kg", "RemoteArea": "67/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "300-1000", "BKK": "50/kg", "OtherCity": "60/kg", "RemoteArea": "65/kg", "DeliveryBy": "", "type": "Cosmetic"}
+    ],
+    "Textile": [
+      {"Kg": "1", "BKK": "80", "OtherCity": "90", "RemoteArea": "95", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Textile"},
+      {"Kg": "2", "BKK": "160", "OtherCity": "180", "RemoteArea": "190", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "3", "BKK": "240", "OtherCity": "270", "RemoteArea": "285", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "4", "BKK": "320", "OtherCity": "360", "RemoteArea": "380", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "5", "BKK": "400", "OtherCity": "450", "RemoteArea": "475", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "6", "BKK": "480", "OtherCity": "540", "RemoteArea": "570", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "7", "BKK": "560", "OtherCity": "630", "RemoteArea": "665", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "8", "BKK": "640", "OtherCity": "720", "RemoteArea": "760", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "9", "BKK": "720", "OtherCity": "810", "RemoteArea": "855", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "10", "BKK": "800", "OtherCity": "900", "RemoteArea": "950", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "11", "BKK": "825", "OtherCity": "935", "RemoteArea": "990", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "12", "BKK": "900", "OtherCity": "1020", "RemoteArea": "1080", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "13", "BKK": "975", "OtherCity": "1105", "RemoteArea": "1170", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "14", "BKK": "1050", "OtherCity": "1190", "RemoteArea": "1260", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "15", "BKK": "1125", "OtherCity": "1275", "RemoteArea": "1350", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "16", "BKK": "1200", "OtherCity": "1360", "RemoteArea": "1440", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "17", "BKK": "1275", "OtherCity": "1445", "RemoteArea": "1530", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "18", "BKK": "1350", "OtherCity": "1530", "RemoteArea": "1620", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "19", "BKK": "1425", "OtherCity": "1615", "RemoteArea": "1710", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "20", "BKK": "1500", "OtherCity": "1700", "RemoteArea": "1800", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "21", "BKK": "1533", "OtherCity": "1743", "RemoteArea": "1848", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "22", "BKK": "1540", "OtherCity": "1760", "RemoteArea": "1870", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "23", "BKK": "1610", "OtherCity": "1840", "RemoteArea": "1955", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "24", "BKK": "1680", "OtherCity": "1920", "RemoteArea": "2040", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "25", "BKK": "1750", "OtherCity": "2000", "RemoteArea": "2125", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "26", "BKK": "1820", "OtherCity": "2080", "RemoteArea": "2210", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "27", "BKK": "1890", "OtherCity": "2160", "RemoteArea": "2295", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "28", "BKK": "1960", "OtherCity": "2240", "RemoteArea": "2380", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "29", "BKK": "2030", "OtherCity": "2320", "RemoteArea": "2465", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "30", "BKK": "2100", "OtherCity": "2400", "RemoteArea": "2550", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "30-50", "BKK": "68/kg", "OtherCity": "78/kg", "RemoteArea": "83/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "50-100", "BKK": "65/kg", "OtherCity": "75/kg", "RemoteArea": "80/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "200", "BKK": "63/kg", "OtherCity": "73/kg", "RemoteArea": "78/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "300", "BKK": "63/kg", "OtherCity": "73/kg", "RemoteArea": "78/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "300-1000", "BKK": "60/kg", "OtherCity": "70/kg", "RemoteArea": "75/kg", "DeliveryBy": "", "type": "Textile"}
+    ],
+    "Electronic": [
+      {"Kg": "1", "New": "800", "Used": "500", "type": "Electronic"},
+      {"Kg": "2", "New": "900", "Used": "700", "type": "Electronic"},
+      {"Kg": "3", "New": "1800", "Used": "1400", "type": "Electronic"},
+      {"Kg": "4", "New": "2000", "Used": "1600", "type": "Electronic"},
+      {"Kg": "5", "New": "2500", "Used": "2000", "type": "Electronic"},
+      {"Kg": "5-10", "New": "3800", "Used": "3200", "type": "Electronic"}
+    ]
+            },
+            "YGN-CNX": {
+ "Food": [
+      {"Kg": "1", "BKK": "40", "OtherCity": "40", "RemoteArea": "40", "type": "Food"},
+      {"Kg": "2", "BKK": "80", "OtherCity": "80", "RemoteArea": "80", "type": "Food"},
+      {"Kg": "3", "BKK": "120", "OtherCity": "120", "RemoteArea": "120", "type": "Food"},
+      {"Kg": "4", "BKK": "160", "OtherCity": "160", "RemoteArea": "160", "type": "Food"},
+      {"Kg": "5", "BKK": "200", "OtherCity": "200", "RemoteArea": "200", "type": "Food"},
+      {"Kg": "6", "BKK": "240", "OtherCity": "240", "RemoteArea": "240", "type": "Food"},
+      {"Kg": "7", "BKK": "280", "OtherCity": "280", "RemoteArea": "280", "type": "Food"},
+      {"Kg": "8", "BKK": "320", "OtherCity": "320", "RemoteArea": "320", "type": "Food"},
+      {"Kg": "9", "BKK": "360", "OtherCity": "360", "RemoteArea": "360", "type": "Food"},
+      {"Kg": "10", "BKK": "400", "OtherCity": "400", "RemoteArea": "400", "type": "Food"},
+      {"Kg": "11", "BKK": "440", "OtherCity": "440", "RemoteArea": "440", "type": "Food"},
+      {"Kg": "12", "BKK": "480", "OtherCity": "480", "RemoteArea": "480", "type": "Food"},
+      {"Kg": "13", "BKK": "520", "OtherCity": "520", "RemoteArea": "520", "type": "Food"},
+      {"Kg": "14", "BKK": "560", "OtherCity": "560", "RemoteArea": "560", "type": "Food"},
+      {"Kg": "15", "BKK": "600", "OtherCity": "600", "RemoteArea": "600", "type": "Food"},
+      {"Kg": "16", "BKK": "640", "OtherCity": "640", "RemoteArea": "640", "type": "Food"},
+      {"Kg": "17", "BKK": "680", "OtherCity": "680", "RemoteArea": "680", "type": "Food"},
+      {"Kg": "18", "BKK": "720", "OtherCity": "720", "RemoteArea": "720", "type": "Food"},
+      {"Kg": "19", "BKK": "760", "OtherCity": "760", "RemoteArea": "760", "type": "Food"},
+      {"Kg": "20", "BKK": "800", "OtherCity": "800", "RemoteArea": "800", "type": "Food"},
+      {"Kg": "21", "BKK": "840", "OtherCity": "840", "RemoteArea": "840", "type": "Food"},
+      {"Kg": "22", "BKK": "880", "OtherCity": "880", "RemoteArea": "880", "type": "Food"},
+      {"Kg": "23", "BKK": "920", "OtherCity": "920", "RemoteArea": "920", "type": "Food"},
+      {"Kg": "24", "BKK": "960", "OtherCity": "960", "RemoteArea": "960", "type": "Food"},
+      {"Kg": "25", "BKK": "1000", "OtherCity": "1000", "RemoteArea": "1000", "type": "Food"},
+      {"Kg": "26", "BKK": "1040", "OtherCity": "1040", "RemoteArea": "1040", "type": "Food"},
+      {"Kg": "27", "BKK": "1080", "OtherCity": "1080", "RemoteArea": "1080", "type": "Food"},
+      {"Kg": "28", "BKK": "1120", "OtherCity": "1120", "RemoteArea": "1120", "type": "Food"},
+      {"Kg": "29", "BKK": "1160", "OtherCity": "1160", "RemoteArea": "1160", "type": "Food"},
+      {"Kg": "30", "BKK": "1200", "OtherCity": "1200", "RemoteArea": "1200", "type": "Food"},
+      {"Kg": "30-40", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Food"},
+      {"Kg": "40-50", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Food"},
+      {"Kg": "50-70", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Food"},
+      {"Kg": "70-100", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Food"},
+      {"Kg": "100", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Food"},
+      {"Kg": "200", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Food"},
+      {"Kg": "300", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Food"},
+      {"Kg": "300-1000", "BKK": "35/kg", "OtherCity": "35/kg", "RemoteArea": "35/kg", "type": "Food"}
+    ],
+    "Cosmetic": [
+      {"Kg": "1", "BKK": "40", "OtherCity": "40", "RemoteArea": "40", "type": "Cosmetic"},
+      {"Kg": "2", "BKK": "80", "OtherCity": "80", "RemoteArea": "80", "type": "Cosmetic"},
+      {"Kg": "3", "BKK": "120", "OtherCity": "120", "RemoteArea": "120", "type": "Cosmetic"},
+      {"Kg": "4", "BKK": "160", "OtherCity": "160", "RemoteArea": "160", "type": "Cosmetic"},
+      {"Kg": "5", "BKK": "200", "OtherCity": "200", "RemoteArea": "200", "type": "Cosmetic"},
+      {"Kg": "6", "BKK": "240", "OtherCity": "240", "RemoteArea": "240", "type": "Cosmetic"},
+      {"Kg": "7", "BKK": "280", "OtherCity": "280", "RemoteArea": "280", "type": "Cosmetic"},
+      {"Kg": "8", "BKK": "320", "OtherCity": "320", "RemoteArea": "320", "type": "Cosmetic"},
+      {"Kg": "9", "BKK": "360", "OtherCity": "360", "RemoteArea": "360", "type": "Cosmetic"},
+      {"Kg": "10", "BKK": "400", "OtherCity": "400", "RemoteArea": "400", "type": "Cosmetic"},
+      {"Kg": "11", "BKK": "440", "OtherCity": "440", "RemoteArea": "440", "type": "Cosmetic"},
+      {"Kg": "12", "BKK": "480", "OtherCity": "480", "RemoteArea": "480", "type": "Cosmetic"},
+      {"Kg": "13", "BKK": "520", "OtherCity": "520", "RemoteArea": "520", "type": "Cosmetic"},
+      {"Kg": "14", "BKK": "560", "OtherCity": "560", "RemoteArea": "560", "type": "Cosmetic"},
+      {"Kg": "15", "BKK": "600", "OtherCity": "600", "RemoteArea": "600", "type": "Cosmetic"},
+      {"Kg": "16", "BKK": "640", "OtherCity": "640", "RemoteArea": "640", "type": "Cosmetic"},
+      {"Kg": "17", "BKK": "680", "OtherCity": "680", "RemoteArea": "680", "type": "Cosmetic"},
+      {"Kg": "18", "BKK": "720", "OtherCity": "720", "RemoteArea": "720", "type": "Cosmetic"},
+      {"Kg": "19", "BKK": "760", "OtherCity": "760", "RemoteArea": "760", "type": "Cosmetic"},
+      {"Kg": "20", "BKK": "800", "OtherCity": "800", "RemoteArea": "800", "type": "Cosmetic"},
+      {"Kg": "21", "BKK": "840", "OtherCity": "840", "RemoteArea": "840", "type": "Cosmetic"},
+      {"Kg": "22", "BKK": "880", "OtherCity": "880", "RemoteArea": "880", "type": "Cosmetic"},
+      {"Kg": "23", "BKK": "920", "OtherCity": "920", "RemoteArea": "920", "type": "Cosmetic"},
+      {"Kg": "24", "BKK": "960", "OtherCity": "960", "RemoteArea": "960", "type": "Cosmetic"},
+      {"Kg": "25", "BKK": "1000", "OtherCity": "1000", "RemoteArea": "1000", "type": "Cosmetic"},
+      {"Kg": "26", "BKK": "1040", "OtherCity": "1040", "RemoteArea": "1040", "type": "Cosmetic"},
+      {"Kg": "27", "BKK": "1080", "OtherCity": "1080", "RemoteArea": "1080", "type": "Cosmetic"},
+      {"Kg": "28", "BKK": "1120", "OtherCity": "1120", "RemoteArea": "1120", "type": "Cosmetic"},
+      {"Kg": "29", "BKK": "1160", "OtherCity": "1160", "RemoteArea": "1160", "type": "Cosmetic"},
+      {"Kg": "30", "BKK": "1200", "OtherCity": "1200", "RemoteArea": "1200", "type": "Cosmetic"},
+      {"Kg": "30-40", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Cosmetic"},
+      {"Kg": "40-50", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Cosmetic"},
+      {"Kg": "50-70", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Cosmetic"},
+      {"Kg": "70-100", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Cosmetic"},
+      {"Kg": "100", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Cosmetic"},
+      {"Kg": "200", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Cosmetic"},
+      {"Kg": "300", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Cosmetic"},
+      {"Kg": "300-1000", "BKK": "35/kg", "OtherCity": "35/kg", "RemoteArea": "35/kg", "type": "Cosmetic"}
+    ],
+    "Textile": [
+      {"Kg": "1", "BKK": "40", "OtherCity": "40", "RemoteArea": "40", "type": "Textile"},
+      {"Kg": "2", "BKK": "80", "OtherCity": "80", "RemoteArea": "80", "type": "Textile"},
+      {"Kg": "3", "BKK": "120", "OtherCity": "120", "RemoteArea": "120", "type": "Textile"},
+      {"Kg": "4", "BKK": "160", "OtherCity": "160", "RemoteArea": "160", "type": "Textile"},
+      {"Kg": "5", "BKK": "200", "OtherCity": "200", "RemoteArea": "200", "type": "Textile"},
+      {"Kg": "6", "BKK": "240", "OtherCity": "240", "RemoteArea": "240", "type": "Textile"},
+      {"Kg": "7", "BKK": "280", "OtherCity": "280", "RemoteArea": "280", "type": "Textile"},
+      {"Kg": "8", "BKK": "320", "OtherCity": "320", "RemoteArea": "320", "type": "Textile"},
+      {"Kg": "9", "BKK": "360", "OtherCity": "360", "RemoteArea": "360", "type": "Textile"},
+      {"Kg": "10", "BKK": "400", "OtherCity": "400", "RemoteArea": "400", "type": "Textile"},
+      {"Kg": "11", "BKK": "440", "OtherCity": "440", "RemoteArea": "440", "type": "Textile"},
+      {"Kg": "12", "BKK": "480", "OtherCity": "480", "RemoteArea": "480", "type": "Textile"},
+      {"Kg": "13", "BKK": "520", "OtherCity": "520", "RemoteArea": "520", "type": "Textile"},
+      {"Kg": "14", "BKK": "560", "OtherCity": "560", "RemoteArea": "560", "type": "Textile"},
+      {"Kg": "15", "BKK": "600", "OtherCity": "600", "RemoteArea": "600", "type": "Textile"},
+      {"Kg": "16", "BKK": "640", "OtherCity": "640", "RemoteArea": "640", "type": "Textile"},
+      {"Kg": "17", "BKK": "680", "OtherCity": "680", "RemoteArea": "680", "type": "Textile"},
+      {"Kg": "18", "BKK": "720", "OtherCity": "720", "RemoteArea": "720", "type": "Textile"},
+      {"Kg": "19", "BKK": "760", "OtherCity": "760", "RemoteArea": "760", "type": "Textile"},
+      {"Kg": "20", "BKK": "800", "OtherCity": "800", "RemoteArea": "800", "type": "Textile"},
+      {"Kg": "21", "BKK": "840", "OtherCity": "840", "RemoteArea": "840", "type": "Textile"},
+      {"Kg": "22", "BKK": "880", "OtherCity": "880", "RemoteArea": "880", "type": "Textile"},
+      {"Kg": "23", "BKK": "920", "OtherCity": "920", "RemoteArea": "920", "type": "Textile"},
+      {"Kg": "24", "BKK": "960", "OtherCity": "960", "RemoteArea": "960", "type": "Textile"},
+      {"Kg": "25", "BKK": "1000", "OtherCity": "1000", "RemoteArea": "1000", "type": "Textile"},
+      {"Kg": "26", "BKK": "1040", "OtherCity": "1040", "RemoteArea": "1040", "type": "Textile"},
+      {"Kg": "27", "BKK": "1080", "OtherCity": "1080", "RemoteArea": "1080", "type": "Textile"},
+      {"Kg": "28", "BKK": "1120", "OtherCity": "1120", "RemoteArea": "1120", "type": "Textile"},
+      {"Kg": "29", "BKK": "1160", "OtherCity": "1160", "RemoteArea": "1160", "type": "Textile"},
+      {"Kg": "30", "BKK": "1200", "OtherCity": "1200", "RemoteArea": "1200", "type": "Textile"},
+      {"Kg": "30-40", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Textile"},
+      {"Kg": "40-50", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Textile"},
+      {"Kg": "50-70", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Textile"},
+      {"Kg": "70-100", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Textile"},
+      {"Kg": "100", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Textile"},
+      {"Kg": "200", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Textile"},
+      {"Kg": "300", "BKK": "40/kg", "OtherCity": "40/kg", "RemoteArea": "40/kg", "type": "Textile"},
+      {"Kg": "300-1000", "BKK": "35/kg", "OtherCity": "35/kg", "RemoteArea": "35/kg", "type": "Textile"}
+    ],
+    "Electronic": [
+      {"Kg": "1", "New": "700", "Used": "", "type": "Electronic"},
+      {"Kg": "2", "New": "800", "Used": "", "type": "Electronic"},
+      {"Kg": "3", "New": "1700", "Used": "", "type": "Electronic"},
+      {"Kg": "4", "New": "1800", "Used": "", "type": "Electronic"},
+      {"Kg": "5", "New": "2300", "Used": "", "type": "Electronic"},
+      {"Kg": "5-10", "New": "3500", "Used": "", "type": "Electronic"}
+    ]
+            },
+            "MWD-BKK": {
+                "Food": [
+      {"Kg": "1", "BKK": "50", "OtherCity": "60", "RemoteArea": "65", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Food"},
+      {"Kg": "2", "BKK": "102", "OtherCity": "122", "RemoteArea": "132", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "3", "BKK": "153", "OtherCity": "183", "RemoteArea": "198", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "4", "BKK": "204", "OtherCity": "244", "RemoteArea": "264", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "5", "BKK": "255", "OtherCity": "305", "RemoteArea": "330", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "6", "BKK": "306", "OtherCity": "366", "RemoteArea": "396", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "7", "BKK": "357", "OtherCity": "427", "RemoteArea": "462", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "8", "BKK": "408", "OtherCity": "488", "RemoteArea": "528", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "9", "BKK": "459", "OtherCity": "549", "RemoteArea": "594", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "10", "BKK": "510", "OtherCity": "610", "RemoteArea": "660", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "11", "BKK": "542", "OtherCity": "652", "RemoteArea": "707", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "12", "BKK": "592", "OtherCity": "712", "RemoteArea": "772", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "13", "BKK": "630", "OtherCity": "760", "RemoteArea": "825", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "14", "BKK": "655", "OtherCity": "795", "RemoteArea": "865", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "15", "BKK": "701", "OtherCity": "851", "RemoteArea": "926", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "16", "BKK": "748", "OtherCity": "908", "RemoteArea": "988", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "17", "BKK": "795", "OtherCity": "965", "RemoteArea": "1050", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "18", "BKK": "842", "OtherCity": "1022", "RemoteArea": "1112", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "19", "BKK": "856", "OtherCity": "1046", "RemoteArea": "1141", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "20", "BKK": "867", "OtherCity": "1067", "RemoteArea": "1167", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "21", "BKK": "893", "OtherCity": "1103", "RemoteArea": "1208", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "22", "BKK": "935", "OtherCity": "1155", "RemoteArea": "1265", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "23", "BKK": "978", "OtherCity": "1208", "RemoteArea": "1323", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "24", "BKK": "1020", "OtherCity": "1260", "RemoteArea": "1380", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "25", "BKK": "1063", "OtherCity": "1313", "RemoteArea": "1438", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "26", "BKK": "1105", "OtherCity": "1365", "RemoteArea": "1495", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "27", "BKK": "1148", "OtherCity": "1418", "RemoteArea": "1553", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "28", "BKK": "1190", "OtherCity": "1470", "RemoteArea": "1610", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "29", "BKK": "1233", "OtherCity": "1523", "RemoteArea": "1668", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "30", "BKK": "1275", "OtherCity": "1575", "RemoteArea": "1725", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "30-40", "BKK": "38/kg", "OtherCity": "48/kg", "RemoteArea": "53/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "40-50", "BKK": "37/kg", "OtherCity": "47/kg", "RemoteArea": "52/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "50-70", "BKK": "34/kg", "OtherCity": "44/kg", "RemoteArea": "49/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "70-100", "BKK": "30/kg", "OtherCity": "40/kg", "RemoteArea": "45/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "100", "BKK": "28/kg", "OtherCity": "38/kg", "RemoteArea": "43/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "200", "BKK": "27/kg", "OtherCity": "37/kg", "RemoteArea": "42/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "300", "BKK": "26/kg", "OtherCity": "36/kg", "RemoteArea": "41/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "300-1000", "BKK": "24/kg", "OtherCity": "34/kg", "RemoteArea": "39/kg", "DeliveryBy": "", "type": "Food"}
+    ],
+    "Cosmetic": [
+      {"Kg": "1", "BKK": "60", "OtherCity": "70", "RemoteArea": "75", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "2", "BKK": "119", "OtherCity": "139", "RemoteArea": "149", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "3", "BKK": "179", "OtherCity": "209", "RemoteArea": "224", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "4", "BKK": "238", "OtherCity": "278", "RemoteArea": "298", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "5", "BKK": "298", "OtherCity": "348", "RemoteArea": "373", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "6", "BKK": "357", "OtherCity": "417", "RemoteArea": "447", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "7", "BKK": "417", "OtherCity": "487", "RemoteArea": "522", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "8", "BKK": "476", "OtherCity": "556", "RemoteArea": "596", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "9", "BKK": "536", "OtherCity": "626", "RemoteArea": "671", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "10", "BKK": "595", "OtherCity": "695", "RemoteArea": "745", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "11", "BKK": "608", "OtherCity": "718", "RemoteArea": "773", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "12", "BKK": "663", "OtherCity": "783", "RemoteArea": "843", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "13", "BKK": "718", "OtherCity": "848", "RemoteArea": "913", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "14", "BKK": "774", "OtherCity": "914", "RemoteArea": "984", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "15", "BKK": "829", "OtherCity": "979", "RemoteArea": "1054", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "16", "BKK": "884", "OtherCity": "1044", "RemoteArea": "1124", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "17", "BKK": "939", "OtherCity": "1109", "RemoteArea": "1194", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "18", "BKK": "995", "OtherCity": "1175", "RemoteArea": "1265", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "19", "BKK": "1050", "OtherCity": "1240", "RemoteArea": "1335", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "20", "BKK": "1105", "OtherCity": "1305", "RemoteArea": "1405", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "21", "BKK": "1125", "OtherCity": "1335", "RemoteArea": "1440", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "22", "BKK": "1159", "OtherCity": "1379", "RemoteArea": "1489", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "23", "BKK": "1173", "OtherCity": "1403", "RemoteArea": "1518", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "24", "BKK": "1224", "OtherCity": "1464", "RemoteArea": "1584", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "25", "BKK": "1275", "OtherCity": "1525", "RemoteArea": "1650", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "26", "BKK": "1326", "OtherCity": "1586", "RemoteArea": "1716", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "27", "BKK": "1377", "OtherCity": "1647", "RemoteArea": "1782", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "28", "BKK": "1428", "OtherCity": "1708", "RemoteArea": "1848", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "29", "BKK": "1479", "OtherCity": "1769", "RemoteArea": "1914", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "30", "BKK": "1530", "OtherCity": "1830", "RemoteArea": "1980", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "30-50", "BKK": "49/kg", "OtherCity": "59/kg", "RemoteArea": "64/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "50-100", "BKK": "48/kg", "OtherCity": "58/kg", "RemoteArea": "63/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "200", "BKK": "46/kg", "OtherCity": "56/kg", "RemoteArea": "61/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "300", "BKK": "44/kg", "OtherCity": "54/kg", "RemoteArea": "59/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "300-1000", "BKK": "43/kg", "OtherCity": "53/kg", "RemoteArea": "58/kg", "DeliveryBy": "", "type": "Cosmetic"}
+    ],
+    "Textile": [
+      {"Kg": "1", "BKK": "70", "OtherCity": "80", "RemoteArea": "85", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Textile"},
+      {"Kg": "2", "BKK": "136", "OtherCity": "156", "RemoteArea": "166", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "3", "BKK": "204", "OtherCity": "234", "RemoteArea": "249", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "4", "BKK": "272", "OtherCity": "312", "RemoteArea": "332", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "5", "BKK": "340", "OtherCity": "390", "RemoteArea": "415", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "6", "BKK": "408", "OtherCity": "468", "RemoteArea": "498", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "7", "BKK": "476", "OtherCity": "546", "RemoteArea": "581", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "8", "BKK": "544", "OtherCity": "624", "RemoteArea": "664", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "9", "BKK": "612", "OtherCity": "702", "RemoteArea": "747", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "10", "BKK": "680", "OtherCity": "780", "RemoteArea": "830", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "11", "BKK": "701", "OtherCity": "811", "RemoteArea": "866", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "12", "BKK": "765", "OtherCity": "885", "RemoteArea": "945", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "13", "BKK": "829", "OtherCity": "959", "RemoteArea": "1024", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "14", "BKK": "893", "OtherCity": "1033", "RemoteArea": "1103", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "15", "BKK": "956", "OtherCity": "1106", "RemoteArea": "1181", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "16", "BKK": "1020", "OtherCity": "1180", "RemoteArea": "1260", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "17", "BKK": "1084", "OtherCity": "1254", "RemoteArea": "1339", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "18", "BKK": "1148", "OtherCity": "1328", "RemoteArea": "1418", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "19", "BKK": "1211", "OtherCity": "1401", "RemoteArea": "1496", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "20", "BKK": "1275", "OtherCity": "1475", "RemoteArea": "1575", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "21", "BKK": "1303", "OtherCity": "1513", "RemoteArea": "1618", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "22", "BKK": "1309", "OtherCity": "1529", "RemoteArea": "1639", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "23", "BKK": "1369", "OtherCity": "1599", "RemoteArea": "1714", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "24", "BKK": "1428", "OtherCity": "1668", "RemoteArea": "1788", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "25", "BKK": "1488", "OtherCity": "1738", "RemoteArea": "1863", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "26", "BKK": "1547", "OtherCity": "1807", "RemoteArea": "1937", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "27", "BKK": "1607", "OtherCity": "1877", "RemoteArea": "2012", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "28", "BKK": "1666", "OtherCity": "1946", "RemoteArea": "2086", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "29", "BKK": "1726", "OtherCity": "2016", "RemoteArea": "2161", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "30", "BKK": "1785", "OtherCity": "2085", "RemoteArea": "2235", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "30-50", "BKK": "58/kg", "OtherCity": "68/kg", "RemoteArea": "73/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "50-100", "BKK": "55/kg", "OtherCity": "65/kg", "RemoteArea": "70/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "200", "BKK": "54/kg", "OtherCity": "64/kg", "RemoteArea": "69/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "300", "BKK": "54/kg", "OtherCity": "64/kg", "RemoteArea": "69/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "300-1000", "BKK": "51/kg", "OtherCity": "61/kg", "RemoteArea": "66/kg", "DeliveryBy": "", "type": "Textile"}
+    ],
+    "Electronic": [
+      {"Kg": "1", "New": "680", "Used": "550", "type": "Electronic"},
+      {"Kg": "2", "New": "765", "Used": "770", "type": "Electronic"},
+      {"Kg": "3", "New": "1530", "Used": "1540", "type": "Electronic"},
+      {"Kg": "4", "New": "1700", "Used": "1760", "type": "Electronic"},
+      {"Kg": "5", "New": "2125", "Used": "2200", "type": "Electronic"},
+      {"Kg": "5-10", "New": "3230", "Used": "3500", "type": "Electronic"}
+    ]
+            },
+            "MDY-BKK": {
+               "Food": [
+      {"Kg": "1", "BKK": "70", "OtherCity": "80", "RemoteArea": "85", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Food"},
+      {"Kg": "2", "BKK": "140", "OtherCity": "160", "RemoteArea": "170", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "3", "BKK": "210", "OtherCity": "240", "RemoteArea": "255", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "4", "BKK": "280", "OtherCity": "320", "RemoteArea": "340", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "5", "BKK": "350", "OtherCity": "400", "RemoteArea": "425", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "6", "BKK": "420", "OtherCity": "480", "RemoteArea": "510", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "7", "BKK": "490", "OtherCity": "560", "RemoteArea": "595", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "8", "BKK": "560", "OtherCity": "640", "RemoteArea": "680", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "9", "BKK": "630", "OtherCity": "720", "RemoteArea": "765", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "10", "BKK": "700", "OtherCity": "800", "RemoteArea": "850", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "11", "BKK": "748", "OtherCity": "858", "RemoteArea": "913", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "12", "BKK": "816", "OtherCity": "936", "RemoteArea": "996", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "13", "BKK": "871", "OtherCity": "1001", "RemoteArea": "1066", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "14", "BKK": "910", "OtherCity": "1050", "RemoteArea": "1120", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "15", "BKK": "975", "OtherCity": "1125", "RemoteArea": "1200", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "16", "BKK": "1040", "OtherCity": "1200", "RemoteArea": "1280", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "17", "BKK": "1105", "OtherCity": "1275", "RemoteArea": "1360", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "18", "BKK": "1170", "OtherCity": "1350", "RemoteArea": "1440", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "19", "BKK": "1197", "OtherCity": "1387", "RemoteArea": "1482", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "20", "BKK": "1220", "OtherCity": "1420", "RemoteArea": "1520", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "21", "BKK": "1260", "OtherCity": "1470", "RemoteArea": "1575", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "22", "BKK": "1320", "OtherCity": "1540", "RemoteArea": "1650", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "23", "BKK": "1380", "OtherCity": "1610", "RemoteArea": "1725", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "24", "BKK": "1440", "OtherCity": "1680", "RemoteArea": "1800", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "25", "BKK": "1500", "OtherCity": "1750", "RemoteArea": "1875", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "26", "BKK": "1560", "OtherCity": "1820", "RemoteArea": "1950", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "27", "BKK": "1620", "OtherCity": "1890", "RemoteArea": "2025", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "28", "BKK": "1680", "OtherCity": "1960", "RemoteArea": "2100", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "29", "BKK": "1740", "OtherCity": "2030", "RemoteArea": "2175", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "30", "BKK": "1800", "OtherCity": "2100", "RemoteArea": "2250", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "30-40", "BKK": "55/kg", "OtherCity": "65/kg", "RemoteArea": "70/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "40-50", "BKK": "53/kg", "OtherCity": "63/kg", "RemoteArea": "68/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "50-70", "BKK": "50/kg", "OtherCity": "60/kg", "RemoteArea": "65/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "70-100", "BKK": "45/kg", "OtherCity": "55/kg", "RemoteArea": "60/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "100", "BKK": "43/kg", "OtherCity": "53/kg", "RemoteArea": "58/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "200", "BKK": "42/kg", "OtherCity": "52/kg", "RemoteArea": "57/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "300", "BKK": "40/kg", "OtherCity": "50/kg", "RemoteArea": "55/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "300-1000", "BKK": "38/kg", "OtherCity": "48/kg", "RemoteArea": "53/kg", "DeliveryBy": "", "type": "Food"}
+    ],
+    "Cosmetic": [
+      {"Kg": "1", "BKK": "80", "OtherCity": "90", "RemoteArea": "95", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "2", "BKK": "160", "OtherCity": "180", "RemoteArea": "190", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "3", "BKK": "240", "OtherCity": "270", "RemoteArea": "285", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "4", "BKK": "320", "OtherCity": "360", "RemoteArea": "380", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "5", "BKK": "400", "OtherCity": "450", "RemoteArea": "475", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "6", "BKK": "480", "OtherCity": "540", "RemoteArea": "570", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "7", "BKK": "560", "OtherCity": "630", "RemoteArea": "665", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "8", "BKK": "640", "OtherCity": "720", "RemoteArea": "760", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "9", "BKK": "720", "OtherCity": "810", "RemoteArea": "855", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "10", "BKK": "800", "OtherCity": "900", "RemoteArea": "950", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "11", "BKK": "825", "OtherCity": "935", "RemoteArea": "990", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "12", "BKK": "900", "OtherCity": "1020", "RemoteArea": "1080", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "13", "BKK": "975", "OtherCity": "1105", "RemoteArea": "1170", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "14", "BKK": "1050", "OtherCity": "1190", "RemoteArea": "1260", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "15", "BKK": "1125", "OtherCity": "1275", "RemoteArea": "1350", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "16", "BKK": "1200", "OtherCity": "1360", "RemoteArea": "1440", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "17", "BKK": "1275", "OtherCity": "1445", "RemoteArea": "1530", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "18", "BKK": "1350", "OtherCity": "1530", "RemoteArea": "1620", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "19", "BKK": "1425", "OtherCity": "1615", "RemoteArea": "1710", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "20", "BKK": "1500", "OtherCity": "1700", "RemoteArea": "1800", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "21", "BKK": "1533", "OtherCity": "1743", "RemoteArea": "1848", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "22", "BKK": "1540", "OtherCity": "1760", "RemoteArea": "1870", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "23", "BKK": "1610", "OtherCity": "1840", "RemoteArea": "1955", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "24", "BKK": "1680", "OtherCity": "1920", "RemoteArea": "2040", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "25", "BKK": "1750", "OtherCity": "2000", "RemoteArea": "2125", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "26", "BKK": "1820", "OtherCity": "2080", "RemoteArea": "2210", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "27", "BKK": "1890", "OtherCity": "2160", "RemoteArea": "2295", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "28", "BKK": "1960", "OtherCity": "2240", "RemoteArea": "2380", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "29", "BKK": "2030", "OtherCity": "2320", "RemoteArea": "2465", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "30", "BKK": "2100", "OtherCity": "2400", "RemoteArea": "2550", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "30-50", "BKK": "68/kg", "OtherCity": "78/kg", "RemoteArea": "83/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "50-100", "BKK": "66/kg", "OtherCity": "76/kg", "RemoteArea": "81/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "200", "BKK": "64/kg", "OtherCity": "74/kg", "RemoteArea": "79/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "300", "BKK": "62/kg", "OtherCity": "72/kg", "RemoteArea": "77/kg", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "300-1000", "BKK": "60/kg", "OtherCity": "70/kg", "RemoteArea": "75/kg", "DeliveryBy": "", "type": "Cosmetic"}
+    ],
+    "Textile": [
+      {"Kg": "1", "BKK": "90", "OtherCity": "100", "RemoteArea": "105", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Textile"},
+      {"Kg": "2", "BKK": "180", "OtherCity": "200", "RemoteArea": "210", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "3", "BKK": "270", "OtherCity": "300", "RemoteArea": "315", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "4", "BKK": "360", "OtherCity": "400", "RemoteArea": "420", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "5", "BKK": "450", "OtherCity": "500", "RemoteArea": "525", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "6", "BKK": "540", "OtherCity": "600", "RemoteArea": "630", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "7", "BKK": "630", "OtherCity": "700", "RemoteArea": "735", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "8", "BKK": "720", "OtherCity": "800", "RemoteArea": "840", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "9", "BKK": "810", "OtherCity": "900", "RemoteArea": "945", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "10", "BKK": "900", "OtherCity": "1000", "RemoteArea": "1050", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "11", "BKK": "935", "OtherCity": "1045", "RemoteArea": "1100", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "12", "BKK": "1020", "OtherCity": "1140", "RemoteArea": "1200", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "13", "BKK": "1105", "OtherCity": "1235", "RemoteArea": "1300", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "14", "BKK": "1190", "OtherCity": "1330", "RemoteArea": "1400", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "15", "BKK": "1275", "OtherCity": "1425", "RemoteArea": "1500", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "16", "BKK": "1360", "OtherCity": "1520", "RemoteArea": "1600", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "17", "BKK": "1445", "OtherCity": "1615", "RemoteArea": "1700", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "18", "BKK": "1530", "OtherCity": "1710", "RemoteArea": "1800", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "19", "BKK": "1615", "OtherCity": "1805", "RemoteArea": "1900", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "20", "BKK": "1700", "OtherCity": "1900", "RemoteArea": "2000", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "21", "BKK": "1743", "OtherCity": "1953", "RemoteArea": "2058", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "22", "BKK": "1760", "OtherCity": "1980", "RemoteArea": "2090", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "23", "BKK": "1840", "OtherCity": "2070", "RemoteArea": "2185", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "24", "BKK": "1920", "OtherCity": "2160", "RemoteArea": "2280", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "25", "BKK": "2000", "OtherCity": "2250", "RemoteArea": "2375", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "26", "BKK": "2080", "OtherCity": "2340", "RemoteArea": "2470", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "27", "BKK": "2160", "OtherCity": "2430", "RemoteArea": "2565", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "28", "BKK": "2240", "OtherCity": "2520", "RemoteArea": "2660", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "29", "BKK": "2320", "OtherCity": "2610", "RemoteArea": "2755", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "30", "BKK": "2400", "OtherCity": "2700", "RemoteArea": "2850", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "30-50", "BKK": "78/kg", "OtherCity": "88/kg", "RemoteArea": "93/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "50-100", "BKK": "75/kg", "OtherCity": "85/kg", "RemoteArea": "90/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "200", "BKK": "73/kg", "OtherCity": "83/kg", "RemoteArea": "88/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "300", "BKK": "73/kg", "OtherCity": "83/kg", "RemoteArea": "88/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "300-1000", "BKK": "70/kg", "OtherCity": "80/kg", "RemoteArea": "85/kg", "DeliveryBy": "", "type": "Textile"}
+    ],
+    "Electronic": [
+      {"Kg": "1", "New": "880", "Used": "550", "type": "Electronic"},
+      {"Kg": "2", "New": "990", "Used": "770", "type": "Electronic"},
+      {"Kg": "3", "New": "1980", "Used": "1540", "type": "Electronic"},
+      {"Kg": "4", "New": "2200", "Used": "1760", "type": "Electronic"},
+      {"Kg": "5", "New": "2750", "Used": "2200", "type": "Electronic"},
+      {"Kg": "5-10", "New": "4100", "Used": "3500", "type": "Electronic"}
+    ]
+            },
+            "HPA-BKK": {
+             "Food": [
+      {"Kg": "1", "BKK": "50", "OtherCity": "60", "RemoteArea": "65", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Food"},
+      {"Kg": "2", "BKK": "108", "OtherCity": "128", "RemoteArea": "138", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "3", "BKK": "162", "OtherCity": "192", "RemoteArea": "207", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "4", "BKK": "216", "OtherCity": "256", "RemoteArea": "276", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "5", "BKK": "270", "OtherCity": "320", "RemoteArea": "345", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "6", "BKK": "324", "OtherCity": "384", "RemoteArea": "414", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "7", "BKK": "378", "OtherCity": "448", "RemoteArea": "483", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "8", "BKK": "432", "OtherCity": "512", "RemoteArea": "552", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "9", "BKK": "486", "OtherCity": "576", "RemoteArea": "621", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "10", "BKK": "540", "OtherCity": "640", "RemoteArea": "690", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "11", "BKK": "574", "OtherCity": "684", "RemoteArea": "739", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "12", "BKK": "626", "OtherCity": "746", "RemoteArea": "806", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "13", "BKK": "667", "OtherCity": "797", "RemoteArea": "862", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "14", "BKK": "693", "OtherCity": "833", "RemoteArea": "903", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "15", "BKK": "743", "OtherCity": "893", "RemoteArea": "968", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "16", "BKK": "792", "OtherCity": "952", "RemoteArea": "1032", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "17", "BKK": "842", "OtherCity": "1012", "RemoteArea": "1097", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "18", "BKK": "891", "OtherCity": "1071", "RemoteArea": "1161", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "19", "BKK": "906", "OtherCity": "1096", "RemoteArea": "1191", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Food"},
+      {"Kg": "20", "BKK": "918", "OtherCity": "1118", "RemoteArea": "1218", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "21", "BKK": "945", "OtherCity": "1155", "RemoteArea": "1260", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "22", "BKK": "990", "OtherCity": "1210", "RemoteArea": "1320", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "23", "BKK": "1035", "OtherCity": "1265", "RemoteArea": "1380", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "24", "BKK": "1080", "OtherCity": "1320", "RemoteArea": "1440", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "25", "BKK": "1125", "OtherCity": "1375", "RemoteArea": "1500", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "26", "BKK": "1170", "OtherCity": "1430", "RemoteArea": "1560", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "27", "BKK": "1215", "OtherCity": "1485", "RemoteArea": "1620", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "28", "BKK": "1260", "OtherCity": "1540", "RemoteArea": "1680", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "29", "BKK": "1305", "OtherCity": "1595", "RemoteArea": "1740", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "30", "BKK": "1350", "OtherCity": "1650", "RemoteArea": "1800", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "30-40", "BKK": "41/kg", "OtherCity": "51/kg", "RemoteArea": "56/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "40-50", "BKK": "39/kg", "OtherCity": "49/kg", "RemoteArea": "54/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "50-70", "BKK": "36/kg", "OtherCity": "46/kg", "RemoteArea": "51/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "70-100", "BKK": "32/kg", "OtherCity": "42/kg", "RemoteArea": "47/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "100", "BKK": "30/kg", "OtherCity": "40/kg", "RemoteArea": "45/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "200", "BKK": "29/kg", "OtherCity": "39/kg", "RemoteArea": "44/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "300", "BKK": "27/kg", "OtherCity": "37/kg", "RemoteArea": "42/kg", "DeliveryBy": "", "type": "Food"},
+      {"Kg": "300-1000", "BKK": "25/kg", "OtherCity": "35/kg", "RemoteArea": "40/kg", "DeliveryBy": "", "type": "Food"}
+    ],
+    "Cosmetic": [
+      {"Kg": "1", "BKK": "60", "OtherCity": "70", "RemoteArea": "75", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "2", "BKK": "126", "OtherCity": "146", "RemoteArea": "156", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "3", "BKK": "189", "OtherCity": "219", "RemoteArea": "234", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "4", "BKK": "252", "OtherCity": "292", "RemoteArea": "312", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "5", "BKK": "315", "OtherCity": "365", "RemoteArea": "390", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "6", "BKK": "378", "OtherCity": "438", "RemoteArea": "468", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "7", "BKK": "441", "OtherCity": "511", "RemoteArea": "546", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "8", "BKK": "504", "OtherCity": "584", "RemoteArea": "624", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "9", "BKK": "567", "OtherCity": "657", "RemoteArea": "702", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "10", "BKK": "630", "OtherCity": "730", "RemoteArea": "780", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "11", "BKK": "644", "OtherCity": "754", "RemoteArea": "809", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "12", "BKK": "702", "OtherCity": "822", "RemoteArea": "882", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "13", "BKK": "761", "OtherCity": "891", "RemoteArea": "956", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "14", "BKK": "819", "OtherCity": "959", "RemoteArea": "1029", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "15", "BKK": "878", "OtherCity": "1028", "RemoteArea": "1103", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "16", "BKK": "936", "OtherCity": "1096", "RemoteArea": "1176", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "17", "BKK": "995", "OtherCity": "1165", "RemoteArea": "1250", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "18", "BKK": "1053", "OtherCity": "1233", "RemoteArea": "1323", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "19", "BKK": "1112", "OtherCity": "1302", "RemoteArea": "1397", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "20", "BKK": "1170", "OtherCity": "1370", "RemoteArea": "1470", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "21", "BKK": "1191", "OtherCity": "1401", "RemoteArea": "1506", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "22", "BKK": "1228", "OtherCity": "1448", "RemoteArea": "1558", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "23", "BKK": "1242", "OtherCity": "1472", "RemoteArea": "1587", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "24", "BKK": "1296", "OtherCity": "1536", "RemoteArea": "1656", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "25", "BKK": "1350", "OtherCity": "1600", "RemoteArea": "1725", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "26", "BKK": "1404", "OtherCity": "1664", "RemoteArea": "1794", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "27", "BKK": "1458", "OtherCity": "1728", "RemoteArea": "1863", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "28", "BKK": "1512", "OtherCity": "1792", "RemoteArea": "1932", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "29", "BKK": "1566", "OtherCity": "1856", "RemoteArea": "2001", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "30", "BKK": "1620", "OtherCity": "1920", "RemoteArea": "2070", "DeliveryBy": "", "type": "Cosmetic"},
+      {"Kg": "30-50", "BKK": "52/kg", "OtherCity": "62/kg", "RemoteArea": "67/kg", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "50-100", "BKK": "50/kg", "OtherCity": "60/kg", "RemoteArea": "65/kg", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "200", "BKK": "49/kg", "OtherCity": "59/kg", "RemoteArea": "64/kg", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "300", "BKK": "47/kg", "OtherCity": "57/kg", "RemoteArea": "62/kg", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Cosmetic"},
+      {"Kg": "300-1000", "BKK": "45/kg", "OtherCity": "55/kg", "RemoteArea": "60/kg", "DeliveryBy": "", "type": "Cosmetic"}
+    ],
+    "Textile": [
+      {"Kg": "1", "BKK": "70", "OtherCity": "80", "RemoteArea": "85", "DeliveryBy": "Flash/EMS/Kerry/J&T", "type": "Textile"},
+      {"Kg": "2", "BKK": "144", "OtherCity": "164", "RemoteArea": "174", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "3", "BKK": "216", "OtherCity": "246", "RemoteArea": "261", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "4", "BKK": "288", "OtherCity": "328", "RemoteArea": "348", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "5", "BKK": "360", "OtherCity": "410", "RemoteArea": "435", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "6", "BKK": "432", "OtherCity": "492", "RemoteArea": "522", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "7", "BKK": "504", "OtherCity": "574", "RemoteArea": "609", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "8", "BKK": "576", "OtherCity": "656", "RemoteArea": "696", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "9", "BKK": "648", "OtherCity": "738", "RemoteArea": "783", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "10", "BKK": "720", "OtherCity": "820", "RemoteArea": "870", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "11", "BKK": "743", "OtherCity": "853", "RemoteArea": "908", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "12", "BKK": "810", "OtherCity": "930", "RemoteArea": "990", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "13", "BKK": "878", "OtherCity": "1008", "RemoteArea": "1073", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "14", "BKK": "945", "OtherCity": "1085", "RemoteArea": "1155", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "15", "BKK": "1013", "OtherCity": "1163", "RemoteArea": "1238", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "16", "BKK": "1080", "OtherCity": "1240", "RemoteArea": "1320", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "17", "BKK": "1148", "OtherCity": "1318", "RemoteArea": "1403", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "18", "BKK": "1215", "OtherCity": "1395", "RemoteArea": "1485", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "19", "BKK": "1283", "OtherCity": "1473", "RemoteArea": "1568", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "20", "BKK": "1350", "OtherCity": "1550", "RemoteArea": "1650", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "21", "BKK": "1380", "OtherCity": "1590", "RemoteArea": "1695", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "22", "BKK": "1386", "OtherCity": "1606", "RemoteArea": "1716", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "23", "BKK": "1449", "OtherCity": "1679", "RemoteArea": "1794", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "24", "BKK": "1512", "OtherCity": "1752", "RemoteArea": "1872", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "25", "BKK": "1575", "OtherCity": "1825", "RemoteArea": "1950", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "26", "BKK": "1638", "OtherCity": "1898", "RemoteArea": "2028", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "27", "BKK": "1701", "OtherCity": "1971", "RemoteArea": "2106", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "28", "BKK": "1764", "OtherCity": "2044", "RemoteArea": "2184", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "29", "BKK": "1827", "OtherCity": "2117", "RemoteArea": "2262", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "30", "BKK": "1890", "OtherCity": "2190", "RemoteArea": "2340", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "30-50", "BKK": "61/kg", "OtherCity": "71/kg", "RemoteArea": "76/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "50-100", "BKK": "59/kg", "OtherCity": "69/kg", "RemoteArea": "74/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "200", "BKK": "57/kg", "OtherCity": "67/kg", "RemoteArea": "72/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "300", "BKK": "57/kg", "OtherCity": "67/kg", "RemoteArea": "72/kg", "DeliveryBy": "", "type": "Textile"},
+      {"Kg": "300-1000", "BKK": "54/kg", "OtherCity": "64/kg", "RemoteArea": "69/kg", "DeliveryBy": "", "type": "Textile"}
+    ],
+    "Electronic": [
+      {"Kg": "1", "New": "720", "Used": "450", "type": "Electronic"},
+      {"Kg": "2", "New": "810", "Used": "630", "type": "Electronic"},
+      {"Kg": "3", "New": "1620", "Used": "1260", "type": "Electronic"},
+      {"Kg": "4", "New": "1800", "Used": "1440", "type": "Electronic"},
+      {"Kg": "5", "New": "2250", "Used": "1800", "type": "Electronic"},
+      {"Kg": "6-10", "New": "3420", "Used": "2880", "type": "Electronic"}
+    ]
+            }
+        };
+
+
+        // Function to switch between user and admin tabs
+        function switchTab(tab) {
+            if (tab === 'user') {
+                document.getElementById('user-tab').classList.add('tab-active');
+                document.getElementById('admin-tab').classList.remove('tab-active');
+                document.getElementById('user-panel').classList.remove('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
+                document.getElementById('login-panel').classList.add('hidden');
+                loadRates();
+            } else {
+                document.getElementById('admin-tab').classList.add('tab-active');
+                document.getElementById('user-tab').classList.remove('tab-active');
+                document.getElementById('user-panel').classList.add('hidden');
+                
+                if (isLoggedIn) {
+                    document.getElementById('admin-panel').classList.remove('hidden');
+                    document.getElementById('login-panel').classList.add('hidden');
+                    loadAdminRates();
+                } else {
+                    document.getElementById('admin-panel').classList.add('hidden');
+                    document.getElementById('login-panel').classList.remove('hidden');
+                }
+            }
+        }
+
+        // Function to load shipping rates from database or use default rates
+        function loadRates() {
+            document.getElementById('loading-indicator').classList.remove('hidden');
+            document.getElementById('results-container').innerHTML = '';
+            
+            shippingRatesRef.once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists() && snapshot.val()) {
+                        shippingRates = snapshot.val();
+                    } else {
+                        shippingRates = defaultRates;
+                        // Upload default rates to database
+                        shippingRatesRef.set(defaultRates);
+                    }
+                    filterRates();
+                    document.getElementById('loading-indicator').classList.add('hidden');
+                })
+                .catch((error) => {
+                    console.error("Error loading rates: ", error);
+                    shippingRates = defaultRates;
+                    filterRates();
+                    document.getElementById('loading-indicator').classList.add('hidden');
+                });
+        }
+
+        // Filter rates based on user selections
+        function filterRates() {
+            const route = document.getElementById('route-select').value;
+            const type = document.getElementById('type-select').value;
+            const weight = document.getElementById('weight-search').value.toLowerCase();
+
+            let filteredRates = [];
+
+            if (shippingRates[route]) {
+                if (type === 'all') {
+                    // Combine all rates for the selected route
+                    if (shippingRates[route]['Food']) filteredRates = filteredRates.concat(shippingRates[route]['Food']);
+                    if (shippingRates[route]['Cosmetic']) filteredRates = filteredRates.concat(shippingRates[route]['Cosmetic']);
+                    if (shippingRates[route]['Textile']) filteredRates = filteredRates.concat(shippingRates[route]['Textile']);
+                    if (shippingRates[route]['Electronic']) filteredRates = filteredRates.concat(shippingRates[route]['Electronic']);
+                } else if (shippingRates[route][type]) {
+                    // Only get rates for the selected type
+                    filteredRates = shippingRates[route][type];
+                }
+            }
+
+            // Filter by weight if provided
+            if (weight) {
+                filteredRates = filteredRates.filter(rate => 
+                    rate.Kg.toLowerCase().includes(weight)
+                );
+            }
+
+            // Update results count
+            document.getElementById('result-count').textContent = `${filteredRates.length} စာရင်းတွေ့ရှိသည်`;
+
+            displayRates(filteredRates, route);
+        }
+
+        // Display rates in the results container
+        function displayRates(rates, route) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = '';
+
+            if (rates.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <div class="bg-white rounded-lg compact-padding shadow-md">
+                            <i class="fas fa-exclamation-circle text-yellow-500 text-3xl mb-2"></i>
+                            <h3 class="text-lg font-bold mb-1">ရှာဖွေတွေ့ရှိမှု မရှိပါ</h3>
+                            <p class="text-gray-600">သင့်ရှာဖွေမှုနှင့် ကိုက်ညီသော နှုန်းထားများ မရှိပါ။</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let routeDisplay = '';
+            switch (route) {
+                case 'YGN-BKK': routeDisplay = 'ရန်ကုန် - ဘန်ကောက်'; break;
+                case 'YGN-CNX': routeDisplay = 'ရန်ကုန် - ချင်းမိုင်'; break;
+                case 'MWD-BKK': routeDisplay = 'မြဝတီ - ဘန်ကောက်'; break;
+                case 'MDY-BKK': routeDisplay = 'မန္တလေး - ဘန်ကောက်'; break;
+                case 'HPA-BKK': routeDisplay = 'ဘားအံ - ဘန်ကောက်'; break;
+            }
+
+            rates.forEach(rate => {
+                let typeDisplay = '';
+                let cardClass = 'rate-card';
+                let typeBadgeClass = 'type-badge';
+                
+                if (rate.type === 'Food') {
+                    typeDisplay = 'အစားအသောက်';
+                    cardClass += ' food-card';
+                    typeBadgeClass += ' food-badge';
+                } else if (rate.type === 'Electronic') {
+                    typeDisplay = 'လျှပ်စစ်ပစ္စည်း';
+                    cardClass += ' electronic-card';
+                    typeBadgeClass += ' electronic-badge';
+                } else if (rate.type === 'Textile') {
+                    typeDisplay = 'အထည်အလိပ်';
+                    cardClass += ' textile-card';
+                    typeBadgeClass += ' textile-badge';
+                } else { // Cosmetic
+                    typeDisplay = 'အလှကုန်ပစ္စည်း';
+                    cardClass += ' cosmetic-card';
+                    typeBadgeClass += ' cosmetic-badge';
+                }
+
+                const card = document.createElement('div');
+                card.className = cardClass + ' shadow-lg';
+
+                // Create different card layouts based on the type
+                if (rate.type === 'Electronic') {
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <div class="route-badge mb-1">${routeDisplay}</div>
+                                <div class="${typeBadgeClass}">${typeDisplay}</div>
+                            </div>
+                            <div class="text-2xl font-bold text-indigo-700">${rate.Kg} kg</div>
+                        </div>
+                        <div class="space-y-2 mt-3">
+                            <div class="flex justify-between items-center border-b pb-1">
+                                <span class="font-medium text-gray-700">အသစ်:</span>
+                                <span class="price-badge">${rate.New} ဘတ်</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-gray-700">အဟောင်း:</span>
+                                <span class="price-badge">${rate.Used} ဘတ်</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <div class="route-badge mb-1">${routeDisplay}</div>
+                                <div class="${typeBadgeClass}">${typeDisplay}</div>
+                            </div>
+                            <div class="text-2xl font-bold text-indigo-700">${rate.Kg} kg</div>
+                        </div>
+                        <div class="space-y-2 mt-3">
+                            <div class="flex justify-between items-center border-b pb-1">
+                                <span class="font-medium text-gray-700">ဘန်ကောက်:</span>
+                                <span class="price-badge">${rate.BKK} ဘတ်</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b pb-1">
+                                <span class="font-medium text-gray-700">အရှေ့နောက်မြောက်:</span>
+                                <span class="price-badge">${rate.OtherCity} ဘတ်</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-gray-700">တောင်ပိုင်း:</span>
+                                <span class="price-badge">${rate.RemoteArea} ဘတ်</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.appendChild(card);
+            });
+        }
+
+        // Admin functions
+        function loadAdminRates() {
+            document.getElementById('admin-loading-indicator').classList.remove('hidden');
+            document.getElementById('admin-results').innerHTML = '';
+            
+            shippingRatesRef.once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists() && snapshot.val()) {
+                        shippingRates = snapshot.val();
+                    } else {
+                        shippingRates = defaultRates;
+                    }
+                    displayAdminRates();
+                    document.getElementById('admin-loading-indicator').classList.add('hidden');
+                })
+                .catch((error) => {
+                    console.error("Error loading admin rates: ", error);
+                    document.getElementById('admin-loading-indicator').classList.add('hidden');
+                });
+        }
+
+        function displayAdminRates() {
+            const container = document.getElementById('admin-results');
+            container.innerHTML = '';
+            
+            for (const route in shippingRates) {
+                for (const type in shippingRates[route]) {
+                    shippingRates[route][type].forEach(rate => {
+                        let typeDisplay = '';
+                        let cardClass = 'rate-card';
+                        let typeBadgeClass = 'type-badge';
+                        
+                        if (rate.type === 'Food') {
+                            typeDisplay = 'အစားအသောက်';
+                            cardClass += ' food-card';
+                            typeBadgeClass += ' food-badge';
+                        } else if (rate.type === 'Electronic') {
+                            typeDisplay = 'လျှပ်စစ်ပစ္စည်း';
+                            cardClass += ' electronic-card';
+                            typeBadgeClass += ' electronic-badge';
+                        } else if (rate.type === 'Textile') {
+                            typeDisplay = 'အထည်အလိပ်';
+                            cardClass += ' textile-card';
+                            typeBadgeClass += ' textile-badge';
+                        } else {
+                            typeDisplay = 'အလှကုန်ပစ္စည်း';
+                            cardClass += ' cosmetic-card';
+                            typeBadgeClass += ' cosmetic-badge';
+                        }
+                        
+                        let routeDisplay = '';
+                        switch (route) {
+                            case 'YGN-BKK': routeDisplay = 'ရန်ကုန် - ဘန်ကောက်'; break;
+                            case 'YGN-CNX': routeDisplay = 'ရန်ကုန် - ချင်းမိုင်'; break;
+                            case 'MWD-BKK': routeDisplay = 'မြဝတီ - ဘန်ကောက်'; break;
+                            case 'MDY-BKK': routeDisplay = 'မန္တလေး - ဘန်ကောက်'; break;
+                            case 'HPA-BKK': routeDisplay = 'ဘားအံ - ဘန်ကောက်'; break;
+                        }
+                        
+                        const card = document.createElement('div');
+                        card.className = cardClass + ' shadow-lg';
+                      // Create different card layouts based on the type
+                        if (rate.type === 'Electronic') {
+                            card.innerHTML = `
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <div class="route-badge mb-1">${routeDisplay}</div>
+                                        <div class="${typeBadgeClass}">${typeDisplay}</div>
+                                    </div>
+                                    <div class="text-2xl font-bold text-indigo-700">${rate.Kg} kg</div>
+                                </div>
+                                <div class="space-y-2 mt-3">
+                                    <div class="flex justify-between items-center border-b pb-1">
+                                        <span class="font-medium text-gray-700">အသစ်:</span>
+                                        <span class="price-badge">${rate.BKK1} ဘတ်</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium text-gray-700">အဟောင်း:</span>
+                                        <span class="price-badge">${rate.Used} ဘတ်</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex justify-between">
+                                    <button onclick="editRate('${route}', '${type}', '${rate.Kg}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md transition" style="font-size: 8px;">
+                                        <i class="fas fa-edit"></i> ပြင်ဆင်ရန်
+                                    </button>
+                                    <button onclick="deleteRate('${route}', '${type}', '${rate.Kg}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md transition" style="font-size: 8px;">
+                                        <i class="fas fa-trash"></i> ဖျက်ရန်
+                                    </button>
+                                </div>
+                            `;
+                        } else {
+                            card.innerHTML = `
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <div class="route-badge mb-1">${routeDisplay}</div>
+                                        <div class="${typeBadgeClass}">${typeDisplay}</div>
+                                    </div>
+                                    <div class="text-2xl font-bold text-indigo-700">${rate.Kg} kg</div>
+                                </div>
+                                <div class="space-y-2 mt-3">
+                                    <div class="flex justify-between items-center border-b pb-1">
+                                        <span class="font-medium text-gray-700">ဘန်ကောက်:</span>
+                                        <span class="price-badge">${rate.BKK} ဘတ်</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-b pb-1">
+                                        <span class="font-medium text-gray-700">အရှေ့နောက်မြောက်:</span>
+                                        <span class="price-badge">${rate.OtherCity} ဘတ်</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium text-gray-700">တောင်ပိုင်း:</span>
+                                        <span class="price-badge">${rate.RemoteArea} ဘတ်</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex justify-between">
+                                    <button onclick="editRate('${route}', '${type}', '${rate.Kg}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md transition" style="font-size: 8px;">
+                                        <i class="fas fa-edit"></i> ပြင်ဆင်ရန်
+                                    </button>
+                                    <button onclick="deleteRate('${route}', '${type}', '${rate.Kg}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md transition" style="font-size: 8px;">
+                                        <i class="fas fa-trash"></i> ဖျက်ရန်
+                                    </button>
+                                </div>
+                            `;
+                        }
+                        container.appendChild(card);
+                    });
+                }
+            }
+        }
+
+        // Admin login function
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('login-error');
+            
+            if (!email || !password) {
+                errorElement.innerText = 'အီးမေးလ် နှင့် စကားဝှက် ထည့်သွင်းပေးပါ။';
+                errorElement.classList.remove('hidden');
+                return;
+            }
+            
+            errorElement.classList.add('hidden');
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    document.getElementById('login-panel').classList.add('hidden');
+                    document.getElementById('admin-panel').classList.remove('hidden');
+                    isLoggedIn = true;
+                    loadAdminRates();
+                })
+                .catch((error) => {
+                    errorElement.innerText = 'အကောင့်ဝင်ရန် မအောင်မြင်ပါ။ ထည့်သွင်းထားသော အချက်အလက်များကို စစ်ဆေးပါ။';
+                    errorElement.classList.remove('hidden');
+                    console.error('Login error:', error);
+                });
+        }
+
+        // Logout function
+        function logout() {
+            auth.signOut().then(() => {
+                isLoggedIn = false;
+                document.getElementById('admin-panel').classList.add('hidden');
+                document.getElementById('login-panel').classList.remove('hidden');
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+            }).catch((error) => {
+                console.error('Logout error:', error);
+            });
+        }
+
+        // Edit rate function
+        function editRate(route, type, kg) {
+            const rateArray = shippingRates[route][type];
+            const rateObj = rateArray.find(rate => rate.Kg === kg);
+            
+            if (rateObj) {
+                document.getElementById('admin-route').value = route;
+                document.getElementById('admin-type').value = type;
+                document.getElementById('admin-weight').value = rateObj.Kg;
+
+                // Trigger change event to show/hide correct fields
+                document.getElementById('admin-type').dispatchEvent(new Event('change'));
+
+                // Show/hide appropriate fields based on type
+                if (type === 'Electronic') {
+                    document.getElementById('admin-new').value = rateObj.BKK1 || '';
+                    document.getElementById('admin-used').value = rateObj.Used || '';
+                } else {
+                    document.getElementById('admin-bkk').value = rateObj.BKK || '';
+                    document.getElementById('admin-other').value = rateObj.OtherCity || '';
+                    document.getElementById('admin-remote').value = rateObj.RemoteArea || '';
+                }
+                
+                currentEditRate = {
+                    route: route,
+                    type: type,
+                    originalKg: kg
+                };
+                
+                // Scroll to the form
+                document.querySelector('#admin-panel .glass-effect').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Delete rate function
+        function deleteRate(route, type, kg) {
+            if (confirm('ဤနှုန်းထားကို ဖျက်ရန် သေချာပါသလား?')) {
+                const rateArray = shippingRates[route][type];
+                const rateIndex = rateArray.findIndex(rate => rate.Kg === kg);
+                
+                if (rateIndex !== -1) {
+                    rateArray.splice(rateIndex, 1);
+                    
+                    shippingRatesRef.set(shippingRates)
+                        .then(() => {
+                            alert('နှုန်းထားကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။');
+                            displayAdminRates();
+                        })
+                        .catch((error) => {
+                            console.error("Error deleting rate: ", error);
+                            alert('နှုန်းထားဖျက်ရန် မအောင်မြင်ပါ။');
+                        });
+                }
+            }
+        }
+
+        // Add new rate function
+        function addRate() {
+            if (currentEditRate) {
+                alert('သင်သည် ပြင်ဆင်ခြင်းမုဒ်တွင် ရှိနေသည်။ ကျေးဇူးပြု၍ "နှုန်းထား ပြင်ဆင်ရန်" ခလုတ်ကို အသုံးပြုပါ။');
+                return;
+            }
+
+            const route = document.getElementById('admin-route').value;
+            const type = document.getElementById('admin-type').value;
+            const kg = document.getElementById('admin-weight').value;
+            
+            if (!kg) {
+                alert('ကျေးဇူးပြု၍ အလေးချိန်ကို ထည့်သွင်းပါ။');
+                return;
+            }
+            
+            let newRate = {
+                "Kg": kg,
+                "type": type
+            };
+            
+               // Set properties based on type
+            if (type === 'Electronic') {
+                const bkk1 = document.getElementById('admin-new').value;
+                const used = document.getElementById('admin-used').value;
+                
+                if (!bkk1 || !used) {
+                    alert('ကျေးဇူးပြု၍ လိုအပ်သည့် အချက်အလက်အားလုံးကို ထည့်သွင်းပါ။');
+                    return;
+                }
+                
+                newRate.BKK1 = bkk1;
+                newRate.Used = used;
+            } else {
+                const bkk = document.getElementById('admin-bkk').value;
+                const other = document.getElementById('admin-other').value;
+                const remote = document.getElementById('admin-remote').value;
+                
+                if (!bkk || !other || !remote) {
+                    alert('ကျေးဇူးပြု၍ လိုအပ်သည့် အချက်အလက်အားလုံးကို ထည့်သွင်းပါ။');
+                    return;
+                }
+                
+                newRate.BKK = bkk;
+                newRate.OtherCity = other;
+                newRate.RemoteArea = remote;
+            }
+            
+            // Check if rate already exists
+            const rateExists = shippingRates[route][type].some(rate => rate.Kg === kg);
+            
+            if (rateExists) {
+                alert('ထည့်သွင်းလိုသော အလေးချိန်အတွက် နှုန်းထား ရှိပြီးဖြစ်ပါသည်။ ကျေးဇူးပြု၍ အခြားအလေးချိန် ထည့်သွင်းပါ သို့မဟုတ် ရှိပြီးသားကို ပြင်ဆင်ပါ။');
+                return;
+            }
+            
+            shippingRates[route][type].push(newRate);
+            
+            shippingRatesRef.set(shippingRates)
+                .then(() => {
+                    alert('နှုန်းထားကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။');
+                    clearForm();
+                    displayAdminRates();
+                })
+                .catch((error) => {
+                    console.error("Error saving rate: ", error);
+                    alert('နှုန်းထားသိမ်းဆည်းရန် မအောင်မြင်ပါ။');
+                });
+        }
+
+        // Update existing rate
+        function updateRate() {
+            if (!currentEditRate) {
+                alert('ပြင်ဆင်ရန် နှုန်းထားကို ရွေးချယ်ပါ။');
+                return;
+            }
+            
+            updateExistingRate();
+        }
+
+        // Helper function for updating rates
+        function updateExistingRate() {
+            const route = document.getElementById('admin-route').value;
+            const type = document.getElementById('admin-type').value;
+            const kg = document.getElementById('admin-weight').value;
+            
+            if (!kg) {
+                alert('ကျေးဇူးပြု၍ အလေးချိန်ကို ထည့်သွင်းပါ။');
+                return;
+            }
+            
+            let updatedRate = {
+                "Kg": kg,
+                "type": type
+            };
+            
+            // Set properties based on type
+            if (type === 'Electronic') {
+                const bkk1 = document.getElementById('admin-new').value;
+                const used = document.getElementById('admin-used').value;
+                
+                if (!bkk1 || !used) {
+                    alert('ကျေးဇူးပြု၍ လိုအပ်သည့် အချက်အလက်အားလုံးကို ထည့်သွင်းပါ။');
+                    return;
+                }
+                
+                updatedRate.BKK1 = bkk1;
+                updatedRate.Used = used;
+            } else {
+                const bkk = document.getElementById('admin-bkk').value;
+                const other = document.getElementById('admin-other').value;
+                const remote = document.getElementById('admin-remote').value;
+                
+                if (!bkk || !other || !remote) {
+                    alert('ကျေးဇူးပြု၍ လိုအပ်သည့် အချက်အလက်အားလုံးကို ထည့်သွင်းပါ။');
+                    return;
+                }
+                
+                updatedRate.BKK = bkk;
+                updatedRate.OtherCity = other;
+                updatedRate.RemoteArea = remote;
+            }
+            
+            // If route, type or kg changed, handle the move
+            const hasChangedLocation = currentEditRate.route !== route || currentEditRate.type !== type;
+            const hasChangedKg = currentEditRate.originalKg !== kg;
+
+            if (hasChangedLocation || hasChangedKg) {
+                // Check if the new target location/kg already exists
+                const newLocationExists = shippingRates[route][type].some(rate => rate.Kg === kg);
+                if(newLocationExists) {
+                    alert('သင်ရွှေ့ပြောင်း/ပြောင်းလဲလိုသော နှုန်းထားသည် (Route/Type/Kg) တူညီစွာဖြင့် ရှိနှင့်ပြီး ဖြစ်သည်။ ကျေးဇူးပြု၍ စစ်ဆေးပါ။');
+                    return;
+                }
+
+                // Delete from original location
+                const originalRateArray = shippingRates[currentEditRate.route][currentEditRate.type];
+                const originalRateIndex = originalRateArray.findIndex(rate => rate.Kg === currentEditRate.originalKg);
+                if (originalRateIndex !== -1) {
+                    originalRateArray.splice(originalRateIndex, 1);
+                }
+                
+                // Add to new location
+                shippingRates[route][type].push(updatedRate);
+
+            } else {
+                // Update in place
+                const rateArray = shippingRates[route][type];
+                const rateIndex = rateArray.findIndex(rate => rate.Kg === currentEditRate.originalKg);
+                
+                if (rateIndex !== -1) {
+                    rateArray[rateIndex] = updatedRate;
+                }
+            }
+            
+            shippingRatesRef.set(shippingRates)
+                .then(() => {
+                    alert('နှုန်းထားကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ။');
+                    clearForm();
+                    displayAdminRates();
+                })
+                .catch((error) => {
+                    console.error("Error updating rate: ", error);
+                    alert('နှုန်းထားပြင်ဆင်ရန် မအောင်မြင်ပါ။');
+                });
+        }
+
+        // Clear form function
+        function clearForm() {
+            document.getElementById('admin-weight').value = '';
+            document.getElementById('admin-bkk').value = '';
+            document.getElementById('admin-other').value = '';
+            document.getElementById('admin-remote').value = '';
+            document.getElementById('admin-new').value = '';
+            document.getElementById('admin-used').value = '';
+            currentEditRate = null;
+        }
+
+        // Initialize data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Trigger change event once on load to set correct visibility
+            document.getElementById('admin-type').dispatchEvent(new Event('change'));
+            loadRates();
+        });
+    </script>
+</body>
+</html>
